@@ -15,6 +15,9 @@ export type HomeStackProps = {
   Notification:undefined
   Addtask:undefined;
   Taskdetails:undefined;
-  Taskstatus:undefined
+  Taskstatus:undefined;
+  Userchat: {
+    userdata: any;
+  };
 
 }

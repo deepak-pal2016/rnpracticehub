@@ -57,13 +57,10 @@ const Addtask: FC = () => {
     (state: any) => state?.userlist?.userlist?.data,
   );
 
-  const userlistArr = useMemo(() => {
-    return userState?.map((item: any) => ({
+    const userlistArr = userState?.filter((item:any) => item?._id !== userData?._id).map((item: any) => ({
       label: item?.name,
       value: item?._id,
     }));
-  }, [userState]);
-
 
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = addtaskStyles(currentTheme);

@@ -32,6 +32,7 @@ const styles =(theme:any) => StyleSheet.create({
 
   textContainer: {
     flex: 1,
+    left:hp(1)
   },
 
   name: {

@@ -7,7 +7,8 @@ import Users from "@screens/home/userslist/users";
 import Tasklist from "@screens/home/task/tasklist";
 import Notification from "@screens/home/notifications/notification";
 import Signup from '@screens/auth/register/signup'
-import Taskdetails from "./home/task/taskdetails";
-import Taskstatus from "./home/task/taskstatus";
+import Taskdetails from "@screens/home/task/taskdetails";
+import Taskstatus from '@screens/home/task/taskstatus';
+import Userchat from "@screens/home/chat/userchat";
 
-export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus}
+export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus,Userchat}

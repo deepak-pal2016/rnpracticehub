@@ -14,73 +14,94 @@ import { HomeStackProps } from 'src/@types';
 import { ThemeContext } from '../../../context/themeContext';
 import { DarkTheme, Header, LightTheme, TextView } from '@components/index';
 import usersStyles from '@styles/usersStyles';
+import { useSelector } from 'react-redux';
+import { UserData, UserDataContext } from '../../../context/userDataContext';
+import Colors from '@constant/colors';
+import Typography from '@constant/fontSize';
+import { useNavigation } from '@react-navigation/native';
 type UsersscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
   'Users'
 >;
 
-const userslist = [
-  {
-    id: "1",
-    name: "Rahul Sharma",
-    message: "Hey, are you available?",
-    time: "10:30 AM",
-    image: "https://randomuser.me/api/portraits/men/32.jpg",
-  },
-  {
-    id: "2",
-    name: "Priya Singh",
-    message: "Task completed 👍",
-    time: "09:45 AM",
-    image: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    id: "3",
-    name: "Aman Verma",
-    message: "Let's discuss the project",
-    time: "Yesterday",
-    image: "https://randomuser.me/api/portraits/men/55.jpg",
-  },
-  {
-    id: "4",
-    name: "Neha Gupta",
-    message: "Meeting at 5 PM",
-    time: "Yesterday",
-    image: "https://randomuser.me/api/portraits/women/65.jpg",
-  },
-];
-
-const Users:FC = () => {
+const Users: FC = () => {
   const { theme } = useContext(ThemeContext);
+  const navigation = useNavigation<UsersscreenNavigationType>()
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = usersStyles(currentTheme);
+  const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
+  const userState = useSelector(
+    (state: any) => state?.userlist?.userlist?.data,
+  );
+
+  const userlistArr = userState?.filter(
+    (item: any) => item?._id !== userData?._id,
+  );
+
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(' ');
+    const first = parts[0]?.charAt(0) || '';
+    const last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+    return (first + last).toUpperCase();
+  };
+
+  const colors = [
+  '#FF5733',
+  '#33B5FF',
+  '#9C27B0',
+  '#4CAF50',
+  '#FF9800',
+  '#E91E63',
+];
+
+const getColor = (name: string) => {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % colors.length;
+  return colors[index];
+};
+
+const avatarBaseStyle = {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  justifyContent: 'center' as const,
+  alignItems: 'center' as const,
+};
 
   const renderItem = ({ item }: any) => {
-    return(
-    <TouchableOpacity style={styles.card}>
-      
-      <Image source={{ uri: item.image }} style={styles.avatar} />
-
-      <View style={styles.textContainer}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.message}>{item.message}</Text>
-      </View>
-
-      <View style={styles.rightSection}>
-        <Text style={styles.time}>{item.time}</Text>
-        <Icon name="chatbubble-ellipses-outline" size={20} color="#9CA3AF" />
-      </View>
-
-    </TouchableOpacity>
-    )
-  }
+    return (
+      <TouchableOpacity onPress={()=> navigation.navigate('Userchat', {'userdata':item})} style={styles.card}>
+        <View
+          style={[
+            avatarBaseStyle,
+            { backgroundColor: getColor(item.name) },
+          ]}
+        >
+          <TextView style={{color:Colors.SECONDARY[100],...Typography.BodyRegular13}}>
+            {getInitials(item.name)}
+          </TextView>
+        </View>
+        <View style={styles.textContainer}>
+          <TextView style={styles.name}>{item.name}</TextView>
+          {/* <TextView style={styles.message}>{item.message}</TextView> */}
+        </View>
+        <View style={styles.rightSection}>
+          <TextView style={styles.time}>{item.time}</TextView>
+          <Icon name="chatbubble-ellipses-outline" size={20} color="#9CA3AF" />
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <Header showicons={true} screenname='Chat List'   showheader={false}/>
+      <Header showicons={true} screenname="Chat List" showheader={false} />
       <FlatList
-        data={userslist}
-        keyExtractor={item => item.id}
+        data={userlistArr}
+        keyExtractor={item => item._id}
         renderItem={renderItem}
       />
     </View>
