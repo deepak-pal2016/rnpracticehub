@@ -9,6 +9,7 @@ import {
   Pressable,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -34,6 +35,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Getuserlist } from '@redux/slices/userSlice';
 import { UserData, UserDataContext } from '../../../context/userDataContext';
 import { LocalStorage } from '@helpers/localstorage';
+import { UsePagination } from '../../../hooks/usepagination';
 import { Logoutuser } from '@redux/slices/authSlice';
 import { showError, showSuccess } from '@components/Flashmessge';
 import { Getallusertask } from '@redux/slices/taskSlice';
@@ -55,8 +57,13 @@ const Dashboard: FC = () => {
   const alltasklist = useSelector(
     (state: any) => state?.getalltask?.data?.data,
   );
+  const pagesize = alltasklist?.length > 10 ? 5 : 3;
+  const { data, loading, hasMore, loadMore } = UsePagination(
+    alltasklist,
+    pagesize,
+  );
   const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
-  const [tasklist, setTaskList] = useState<any>([]);  
+  const [tasklist, setTaskList] = useState<any>([]);
   const pendingtask = useMemo(() => {
     return (alltasklist || []).filter(
       (item: any) => item?.status === 'pending',
@@ -73,7 +80,6 @@ const Dashboard: FC = () => {
     fetchuserliset();
   }, [userData?.email]);
 
-  
   useEffect(() => {
     setTaskList([
       {
@@ -98,9 +104,14 @@ const Dashboard: FC = () => {
     try {
       showLoader();
       const resp: any = await dispatch(Getallusertask(userData?._id));
+      console.log(resp, '-3-3-3');
+
       if (resp?.payload?.status === true) {
         await dispatch(Getuserlist(userData?.email)).unwrap();
-      } else if (resp?.payload === 'Token expired or invalid') {
+      } else if (
+        resp?.payload === 'Token expired or invalid' ||
+        resp?.payload === 'Token expired'
+      ) {
         handlelogout(userData);
       } else {
         showError('somehting went wrong,  down refresh.');
@@ -117,27 +128,26 @@ const Dashboard: FC = () => {
   };
 
   useEffect(() => {
-  const unsubscribe = messaging().onMessage(async remoteMessage => {
-    // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-    dispatch(Getallusertask(userData?._id))
-    await notifee.displayNotification({
-      title: remoteMessage.notification?.title,
-      body: remoteMessage.notification?.body,
-      android: {
-        channelId: 'default',
-        smallIcon: 'ic_launcher',
-      },
+    const unsubscribe = messaging().onMessage(async remoteMessage => {
+      // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      dispatch(Getallusertask(userData?._id));
+      await notifee.displayNotification({
+        title: remoteMessage.notification?.title,
+        body: remoteMessage.notification?.body,
+        android: {
+          channelId: 'default',
+          smallIcon: 'ic_launcher',
+        },
+      });
     });
 
-  });
-
-  return unsubscribe;
-}, []);
+    return unsubscribe;
+  }, []);
 
   const handlelogout = async (userData: any) => {
     try {
-      const response: any = dispatch(Logoutuser(userData)).unwrap();
-      console.log(response, 'logout response');
+      // const response: any = dispatch(Logoutuser(userData)).unwrap();
+      // console.log(response, 'logout response');
       setIsLoggedIn(false);
       await LocalStorage.save('@login', false);
       await LocalStorage.flushQuestionKeys();
@@ -225,58 +235,67 @@ const Dashboard: FC = () => {
               paddingHorizontal: hp(1),
             }}
           >
-            
             {/* Right Avatar */}
             <Image source={Images.ic_userimg} style={styles.avatarview} />
           </View>
         </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: hp(1) }}>
-          <View
+        <View
           style={{
-            backgroundColor: item?.status === 'completed' ?  Colors.PRIMARY[500] : Colors.PRIMARY[100],
-            borderRadius: hp(2),
-            right: hp(1),
-            alignSelf: 'flex-end',
-            top: hp(1),
-            paddingHorizontal: wp(3),
-            paddingVertical: hp(1),
-            bottom: hp(0),
-          }}  >
-          <TextView
-            style={{
-              color: Colors.SECONDARY[100],
-              ...Typography.BodyRegular12,
-            }}
-          >
-           {item?.status?.charAt(0).toUpperCase() + item?.status?.slice(1)}
-          </TextView>
-        </View>
-        <TouchableOpacity
-          style={{
-            backgroundColor: Colors.PRIMARY[100],
-            borderRadius: hp(2),
-            left: hp(1),
-            alignSelf: 'flex-end',
-            top: hp(1),
-            paddingHorizontal: wp(3),
-            paddingVertical: hp(1),
-            bottom: hp(0),
-          }}
-          activeOpacity={0.7}
-          onPress={() => {
-            navigation.navigate('Taskdetails' as any, { detailstask: item });
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            marginTop: hp(1),
           }}
         >
-          <TextView
+          <View
             style={{
-              color: Colors.SECONDARY[100],
-              ...Typography.BodyRegular12,
+              backgroundColor:
+                item?.status === 'completed'
+                  ? Colors.PRIMARY[500]
+                  : Colors.PRIMARY[100],
+              borderRadius: hp(2),
+              right: hp(1),
+              alignSelf: 'flex-end',
+              top: hp(1),
+              paddingHorizontal: wp(3),
+              paddingVertical: hp(1),
+              bottom: hp(0),
             }}
           >
-            View Details
-          </TextView>
-        </TouchableOpacity>
-      </View>
+            <TextView
+              style={{
+                color: Colors.SECONDARY[100],
+                ...Typography.BodyRegular12,
+              }}
+            >
+              {item?.status?.charAt(0).toUpperCase() + item?.status?.slice(1)}
+            </TextView>
+          </View>
+          <TouchableOpacity
+            style={{
+              backgroundColor: Colors.PRIMARY[100],
+              borderRadius: hp(2),
+              left: hp(1),
+              alignSelf: 'flex-end',
+              top: hp(1),
+              paddingHorizontal: wp(3),
+              paddingVertical: hp(1),
+              bottom: hp(0),
+            }}
+            activeOpacity={0.7}
+            onPress={() => {
+              navigation.navigate('Taskdetails' as any, { detailstask: item });
+            }}
+          >
+            <TextView
+              style={{
+                color: Colors.SECONDARY[100],
+                ...Typography.BodyRegular12,
+              }}
+            >
+              View Details
+            </TextView>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   };
@@ -397,18 +416,35 @@ const Dashboard: FC = () => {
         </View>
         <View style={{ bottom: hp(3) }}>
           <FlatList
-            data={alltasklist}
+            data={data}
             keyExtractor={(item, index) => index.toString()}
             renderItem={renderItem}
             showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps='handled'
+            keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
-              paddingBottom: hp(40) + insets.bottom,
+              paddingBottom: hp(33) + insets.bottom,
             }}
             removeClippedSubviews={true}
+            onEndReached={loadMore}
             windowSize={5}
             maxToRenderPerBatch={2}
             initialNumToRender={2}
+            ListFooterComponent={
+              loading ? (
+                <ActivityIndicator size="large" color={Colors.PRIMARY[100]} />
+              ) : !hasMore ? (
+                <TextView
+                  style={{
+                    textAlign: 'center',
+                    padding: 10,
+                    color: Colors.SECONDARY[400],
+                    ...Typography.BodyRegular12,
+                  }}
+                >
+                  No more records available!
+                </TextView>
+              ) : null
+            }
           />
         </View>
       </View>

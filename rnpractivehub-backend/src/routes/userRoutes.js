@@ -2,8 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware')
-const { addUser,getUser, loginUser,logout } = require('../controllers/userContoller');
-const {addTask,getUserTask,completetask} = require('../controllers/taskConroller')
+const { addUser,getUser, loginUser,logout } = require('../controllers/userController');
+const {addTask,getUserTask,completetask} = require('../controllers/taskController')
 
 router.post('/adduser', addUser);
 router.post('/getuser',authMiddleware,getUser)
