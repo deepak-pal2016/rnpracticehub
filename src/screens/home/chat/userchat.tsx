@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   View,
   FlatList,
@@ -45,6 +47,21 @@ const Userchat: FC<any> = props => {
     (state: any) => state?.fetchchat?.data?.data || [],
   );
   const flatlistRef = useRef<FlatList>(null);
+  const [onlineusers,setOnlineUsers] = useState<any>([])
+
+  useEffect(()=>{
+    Socket.emit('onlineusers',  (users:any) => {
+      setOnlineUsers(users)
+    })
+    return()=>{
+      Socket.off('onlineusers')
+    }
+  },[])
+
+  const isOnline = onlineusers.includes(reciever?._id);
+  console.log(isOnline,'iskopnnee',onlineusers,reciever?._id);
+  
+
 
   useEffect(() => {
     Socket.on('connect', () => {
@@ -99,10 +116,10 @@ const Userchat: FC<any> = props => {
 
   useEffect(() => {
     if (userData?._id) {
-      Socket.emit('join', userData?._id); // current user id
+      Socket.emit('join', userData?._id);
       Socket.on('receivemessage', msg => {
         if (!msg._id) {
-          msg._id = Date.now().toString(); // fallback id
+          msg._id = Date.now().toString();
         }
         setMessages(prev => [msg, ...prev]);
       });
@@ -116,14 +133,15 @@ const Userchat: FC<any> = props => {
     if (!text.trim()) return;
 
     const msg = {
-      _id: Date.now().toString(),
+      tempId: Date.now().toString(),
       senderId: userData?._id,
       receiverId: reciever?._id,
       message: text,
       messageType: 'text',
+      createdAt: new Date().toISOString(),
     };
-     setMessages(prev => [...prev, msg]);
     Socket.emit('sendmessage', msg);
+    setMessages(prev => [msg,...prev]);
     setText('');
   };
 
@@ -149,13 +167,13 @@ const Userchat: FC<any> = props => {
             borderTopLeftRadius: isMe ? 12 : 0,
 
             maxWidth: wp(80),
-            ...cardShadow // Android shadow
+            ...cardShadow, // Android shadow
           }}
         >
           {/* Message */}
           <TextView
             style={{
-              color: isMe ?  Colors.SECONDARY[100] : Colors.SECONDARY[200],
+              color: isMe ? Colors.SECONDARY[100] : Colors.SECONDARY[200],
             }}
           >
             {item.message}
@@ -207,11 +225,18 @@ const Userchat: FC<any> = props => {
       >
         <View style={{ flex: 1 }}>
           <FlatList
-            data={[...(messages.length ? messages : chatState)].reverse()}
-            keyExtractor={item => item?._id.toString()}
+            data={[...(messages.length ? messages : chatState)]}
+            keyExtractor={(item, index) =>
+              item?._id?.toString() ||
+              item?.tempId?.toString() ||
+              index.toString()
+            }
             renderItem={renderItem}
-            // inverted
+            inverted
             ref={flatlistRef}
+            onContentSizeChange={() =>
+              flatlistRef.current?.scrollToOffset({ offset: 0 })
+            }
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
@@ -230,7 +255,6 @@ const Userchat: FC<any> = props => {
             />
           </TouchableOpacity>
 
-          {/* 📷 */}
           <TouchableOpacity style={{ marginLeft: hp(0.3) }}>
             <Icon
               name="camera"

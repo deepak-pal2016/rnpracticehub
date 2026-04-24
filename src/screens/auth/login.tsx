@@ -45,6 +45,7 @@ import { LocalStorage } from '@helpers/localstorage';
 import { UserDataContext } from '../../context';
 import { UserData } from '../../context/userDataContext';
 import { useLoginMutation } from '@services/rtkquery/apis/authapi';
+import Socket from '@services/socket/socket';
 type LoginscreenNavigationType = NativeStackNavigationProp<
   AuthStackProps,
   'Login'
@@ -99,6 +100,7 @@ const Login: FC = () => {
             await LocalStorage.save('@login', true);
             setIsLoggedIn(true)
             setUserData(response?.data);
+            Socket.emit('join', response?.data?._id)
             showSuccess('Login Successfully');
           } else {
             showError(response?.message || 'Login failed');

@@ -22,6 +22,7 @@ import { Userauthenticate } from '@redux/slices/authSlice';
 import { AppDispatch } from '@redux/store/store';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
+import Socket from '@services/socket/socket';
 
 const Route: FC = () => {
   const [userLogin, setUserLogin] = useState<any>(undefined);
@@ -29,17 +30,24 @@ const Route: FC = () => {
   const { isLoggedIn } = useContext<UserData>(UserDataContext);
   const { showAlert, hideAlert } = CommonAlertModal();
   const loginState = useSelector((state: any) => state.auth.data);
+  const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
 
   useEffect(() => {
-  async function createChannel() {
-    await notifee.createChannel({
-      id: 'default',
-      name: 'Default Channel',
-    });
-  }
+    async function createChannel() {
+      await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+      });
+    }
 
-  createChannel();
-}, []);
+    createChannel();
+  }, []);
+
+  useEffect(() => {
+    if (userData?._id) {
+      Socket.emit('join', userData?._id);
+    }
+  }, [userData]);
 
   useEffect(() => {
     getAsync();
@@ -98,7 +106,6 @@ const Route: FC = () => {
         }
       });
   }, []);
-
 
   useEffect(() => {
     const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {

@@ -57,6 +57,7 @@ const Dashboard: FC = () => {
   const alltasklist = useSelector(
     (state: any) => state?.getalltask?.data?.data,
   );
+  
   const pagesize = alltasklist?.length > 10 ? 5 : 3;
   const { data, loading, hasMore, loadMore } = UsePagination(
     alltasklist,

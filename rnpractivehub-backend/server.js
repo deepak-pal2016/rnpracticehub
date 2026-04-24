@@ -12,6 +12,7 @@ const io = new Server(server, {
   cors: { origin: '*' },
 });
 
+let onlineusers = {}
 io.on('connection', socket => {
   console.log('user conneced:', socket.id);
 
@@ -19,6 +20,11 @@ io.on('connection', socket => {
     socket.join(userId);
     console.log(`user ${userId} joined`);
   });
+
+  socket.on('join',(userId) => {
+     onlineusers[userId] = socket.id
+     io.emit('onlineusers',Object.keys(onlineusers))
+  })
 
   
   socket.on('sendmessage', async data => {
@@ -33,6 +39,12 @@ io.on('connection', socket => {
   // disconenect socket 
   socket.on('disconnect', () => {
     console.log('user disconnected',socket.id);
+    for(let userId in onlineusers){
+      if(onlineusers[userId] === socket.id){
+        delete onlineusers[userId]
+      }
+    }
+    io.emit('onlineusers',Object.keys(onlineusers))
   });
 });
 
