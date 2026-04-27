@@ -61,24 +61,49 @@ const APiService = {
     const headers = await headersdata(true);
     return APIKit.post('addtask', payload, { headers });
   },
-   getuseralltask: async (payload: any) => {
+  getuseralltask: async (payload: any) => {
     const headers = await headersdata(true);
     return APIKit.post('getusertask', { userid: payload }, { headers });
   },
 
-  markedcompletetask: async(payload:any) => {
+  markedcompletetask: async (payload: any) => {
     const headers = await headersdata(true);
     return APIKit.post('completetask', payload, { headers });
   },
 
-  fetchuserchats:async(payload:any) => {
-    const headers = await headersdata(true)
+  fetchuserchats: async (payload: any) => {
+    const headers = await headersdata(true);
     return APIKit.post('getuserchats', payload, { headers });
   },
 
-  logout: async (payload:any) => {
+  logout: async (payload: any) => {
     const headers = await headersdata(true);
     return APIKit.post('logoutuser', {}, { headers });
+  },
+
+  uplaodaudio: async (filePath: string) => {
+    try {
+      const token = await LocalStorage.read('@token');
+      const formdata = new FormData();
+
+      formdata.append('file', {
+        uri: 'file://' + filePath,
+        type: 'audio/wav',
+        name: 'voice.wav',
+      } as any);
+
+      const res = await APIKit.post('upload', formdata, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return res.data;
+    } catch (error) {
+      console.log('upload error', error);
+      throw error;
+    }
   },
 };
 

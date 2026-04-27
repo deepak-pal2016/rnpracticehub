@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
@@ -19,6 +20,7 @@ import {
   Header,
   LightTheme,
   TextView,
+  Voicerecorder,
 } from '@components/index';
 import { cardShadow, Colors, Icon } from '@constant/index';
 import {
@@ -31,11 +33,10 @@ import { useDispatch, useSelector } from 'react-redux';
 //@ts-ignore
 import type { AppDispatch } from '../../../redux/store';
 import { showError, showSuccess } from '@components/Flashmessge';
-import AudioRecorderPlayer from 'react-native-nitro-sound';
-
+import APiService from '@services/apiservice';
+import AudioPlayer from '@components/Voicerecording/playrecording';
 
 const Userchat: FC<any> = props => {
- const audioRecorderPlayer = AudioRecorderPlayer
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch<AppDispatch>();
   const { reciever } = props.route.params;
@@ -53,6 +54,7 @@ const Userchat: FC<any> = props => {
   const onlineusers = useSelector((state: any) => state?.onlineuser?.users);
   const isonlineuser = onlineusers.includes(String(reciever?._id));
 
+  // connet user with cahat
   useEffect(() => {
     Socket.on('connect', () => {
       console.log('Socket connected:', Socket.id);
@@ -82,7 +84,6 @@ const Userchat: FC<any> = props => {
     const fetchchat = async () => {
       try {
         showLoader();
-
         const body = {
           senderId: userData?._id,
           receiverId: reciever?._id,
@@ -133,6 +134,21 @@ const Userchat: FC<any> = props => {
     setText('');
   };
 
+  // const sendAudioMessage = (filePath: string) => {
+  //   const msg = {
+  //     tempId: Date.now().toString(),
+  //     senderId: userData?._id,
+  //     receiverId: reciever?._id,
+  //     message: '',
+  //     messageType: 'audio',
+  //     mediaUrl: filePath, // ⚠️ abhi local path hai
+  //     createdAt: new Date().toISOString(),
+  //   };
+
+  //   Socket.emit('sendmessage', msg);
+  //   setMessages(prev => [msg, ...prev]);
+  // };
+
   const renderItem = ({ item }: any) => {
     const isMe = item.senderId === userData?._id;
     return (
@@ -167,6 +183,12 @@ const Userchat: FC<any> = props => {
             {item.message}
           </TextView>
 
+          {item.messageType === 'audio' ? (
+            <AudioPlayer url={item.mediaUrl} />
+          ) : (
+            <TextView>{item.message}</TextView>
+          )}
+
           {/* Media (optional) */}
           {item?.mediaUrl && (
             <TextView
@@ -180,7 +202,14 @@ const Userchat: FC<any> = props => {
             </TextView>
           )}
 
+          {/* {item.messageType === 'audio' && (
+            <TouchableOpacity onPress={() => playAudio(item.mediaUrl)}>
+              <TextView>▶️ Play Voice</TextView>
+            </TouchableOpacity>
+          )} */}
+
           {/* Time */}
+
           <TextView
             style={{
               fontSize: 10,
@@ -245,16 +274,40 @@ const Userchat: FC<any> = props => {
             onChangeText={setText}
           />
 
-          <TouchableOpacity>
+          {/* <TouchableOpacity
+            onPressIn={startrecording}
+            onPressOut={stoprecording}
+            // style={styles.sendBtn}
+            style={{right:hp(1)}}
+          >
             <Icon
-              name="mic"
+              name={isRecording ? 'mic-off' : 'mic'}
               size={22}
               color={currentTheme.background}
               family="Ionicons"
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
-          <TouchableOpacity>
+          <Voicerecorder
+            onSend={async (filePath: string) => {
+              const res: any = await APiService.uplaodaudio(filePath);
+              console.log('=====3res', res);
+
+              const msg = {
+                tempId: Date.now().toString(),
+                senderId: userData?._id,
+                receiverId: reciever?._id,
+                messageType: 'audio',
+                mediaUrl: res.url,
+                createdAt: new Date().toISOString(),
+              };
+
+              Socket.emit('sendmessage', msg);
+              setMessages(prev => [msg, ...prev]);
+            }}
+          />
+
+          <TouchableOpacity style={{ right: hp(1.2) }}>
             <Icon
               name="attach"
               size={22}
@@ -263,7 +316,7 @@ const Userchat: FC<any> = props => {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={{ marginLeft: hp(0.3) }}>
+          <TouchableOpacity style={{ marginLeft: hp(0.7) }}>
             <Icon
               name="camera"
               size={22}

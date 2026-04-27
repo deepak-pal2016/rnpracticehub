@@ -39,7 +39,6 @@ const Users: FC = () => {
   const onlineusers = useSelector(
   (state: any) => state?.onlineuser?.users
 );
-  console.log('=3333onlineuser',onlineusers);
   
   const userState = useSelector(
     (state: any) => state?.userlist?.userlist?.data,

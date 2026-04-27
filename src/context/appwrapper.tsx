@@ -10,10 +10,9 @@
 
         useEffect(() => {
             Socket.on('onlineusers',(users) => {
-                console.log('gloabla online users',users);
+                // console.log('gloabla online users',users);
                 dispatch(setOnlineUsers(users))
             })
-
             return ()=>{
                 Socket.off('onlineusers')
             }

@@ -28,16 +28,17 @@ const chatStyles = (theme: any) =>
       borderTopWidth: 0.5,
       borderColor: '#ccc',
       backgroundColor:theme.text,
+      justifyContent:'space-evenly'
     },
     inputtext: {
       flex: 1,
-      marginHorizontal: wp(2.1),
+      marginHorizontal: wp(2.3),
       backgroundColor: '#f2f2f2',
       borderRadius: hp(2),
       paddingHorizontal: hp(2),
-      paddingVertical: Platform.OS === 'ios' ? 10 : hp(1.6),
+      paddingVertical: Platform.OS === 'ios' ? 10 : hp(1.8),
       color: '#000',
-      right:hp(1)
+      right:hp(.2)
     },
   });
 

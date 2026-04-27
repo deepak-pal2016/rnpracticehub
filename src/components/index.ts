@@ -18,6 +18,7 @@ import UpdateModal from '@components/Updateapp/updateversion';
 import DividerWithText from '@components/DividerWithText/DividerWithText';
 import { LightTheme } from '@components/theme/theme';
 import { DarkTheme } from '@components/theme/theme';
+import Voicerecorder from '@components/Voicerecording/voicerecording';
 
 export {
   TextView,
@@ -38,7 +39,8 @@ export {
   UpdateModal,
   DividerWithText,
   DarkTheme,
-  LightTheme
+  LightTheme,
+  Voicerecorder
   
   
 };

@@ -14,12 +14,12 @@ const io = new Server(server, {
 
 let onlineusers = {};
 io.on('connection', socket => {
-  console.log('user conneced:', socket.id);
+//  / console.log('user conneced:', socket.id);
 
   socket.on('user_online', userId => {
     socket.join(userId);
-    console.log('JOINED ROOM:', userId);
-    console.log('SOCKET ID:', socket.id);
+  //  console.log('JOINED ROOM:', userId);
+  //  console.log('SOCKET ID:', socket.id);
 
     onlineusers[userId] = socket.id;
     //console.log(`user ${userId} joined`);
@@ -33,7 +33,7 @@ io.on('connection', socket => {
       const chat = await Chat.create(data);
       // reciever ko messge bhejna
       const receiverSocketId = onlineusers[data.receiverId];
-      console.log('Receiver socket:', receiverSocketId);
+      // console.log('Receiver socket:', receiverSocketId);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('receivemessage', chat);
       }
