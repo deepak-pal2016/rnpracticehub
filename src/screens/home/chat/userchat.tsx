@@ -22,7 +22,7 @@ import {
   TextView,
   Voicerecorder,
 } from '@components/index';
-import { cardShadow, Colors, Icon } from '@constant/index';
+import { cardShadow, Colors, Icon, Typography } from '@constant/index';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -53,6 +53,31 @@ const Userchat: FC<any> = props => {
   const flatlistRef = useRef<FlatList>(null);
   const onlineusers = useSelector((state: any) => state?.onlineuser?.users);
   const isonlineuser = onlineusers.includes(String(reciever?._id));
+  const [typing, setTyping] = useState<boolean>(false);
+  const typingtimeoutRef = useRef<any>(null);
+
+ useEffect(() => {
+  const handleTyping = (data: { senderId: any; recieverId: any; }) => {
+    if (
+      String(data.senderId) === String(reciever?._id) &&
+      String(data.recieverId) === String(userData?._id)
+    ) {
+      setTyping(true);
+
+      if (typingtimeoutRef.current) {
+        clearTimeout(typingtimeoutRef.current);
+      }
+
+      typingtimeoutRef.current = setTimeout(() => {
+        setTyping(false);
+      }, 1000);
+    }
+  };
+  Socket.on('user_typing', handleTyping);
+  return () => {
+    Socket.off('user_typing', handleTyping);
+  };
+}, [reciever?._id, userData?._id]);
 
   // connet user with cahat
   useEffect(() => {
@@ -104,6 +129,7 @@ const Userchat: FC<any> = props => {
 
     fetchchat();
   }, [dispatch, userData?._id, reciever?._id]);
+
 
   useEffect(() => {
     Socket.on('receivemessage', msg => {
@@ -183,9 +209,7 @@ const Userchat: FC<any> = props => {
             {item.message}
           </TextView>
 
-          {item.messageType === 'audio' && (
-            <AudioPlayer url={item.mediaUrl} />
-          )}
+          {item.messageType === 'audio' && <AudioPlayer url={item.mediaUrl} />}
 
           <TextView
             style={{
@@ -210,7 +234,7 @@ const Userchat: FC<any> = props => {
       <Header
         showheader
         title={`${reciever?.name || 'User'} \n ${
-          isonlineuser ? 'online' : 'offline'
+          typing ? 'typing...' : isonlineuser ? 'online' : 'offline'
         }`}
         showicons={false}
       />
@@ -248,7 +272,14 @@ const Userchat: FC<any> = props => {
             placeholder="Type a message"
             placeholderTextColor={Colors.FLOATINGINPUT[100]}
             value={text}
-            onChangeText={setText}
+            onChangeText={value => {
+              setText(value);
+              if (!value.trim()) return;
+              Socket.emit('user_typing', {
+                senderId: userData?._id,
+                recieverId: reciever?._id,
+              });
+            }}
           />
 
           {/* <TouchableOpacity
@@ -268,7 +299,7 @@ const Userchat: FC<any> = props => {
           <Voicerecorder
             onSend={async (filePath: string) => {
               const res: any = await APiService.uplaodaudio(filePath);
-              console.log('=====3res', res);
+              //  console.log('=====3res', res);
 
               const msg = {
                 tempId: Date.now().toString(),

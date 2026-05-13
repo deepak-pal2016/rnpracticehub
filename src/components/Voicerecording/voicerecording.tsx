@@ -53,9 +53,10 @@ const Voicerecorder: FC<voiceRecordProps> = ({ onSend }) => {
       isRecordingRef.current = true;
       setRecording(true);
 
-      // 🔍 Debug mic input
       AudioRecord.on('data', data => {
         // console.log('mic working...');
+        console.log(data,'deepk');
+        
       });
 
     } catch (error) {
@@ -66,14 +67,12 @@ const Voicerecorder: FC<voiceRecordProps> = ({ onSend }) => {
   const stoprecording = async () => {
     try {
       if (!isRecordingRef.current) return;
-
       const filepath = await AudioRecord.stop();
-
       isRecordingRef.current = false;
       setRecording(false);
 
       if (filepath) {
-        console.log('record file:', filepath);
+     //   console.log('record file:', filepath);
         onSend(filepath);
       }
     } catch (err) {
@@ -85,17 +84,16 @@ const Voicerecorder: FC<voiceRecordProps> = ({ onSend }) => {
     <TouchableOpacity
       onPressIn={startrecording}
       onPressOut={() => {
-        // 🔥 avoid instant tap issue
         setTimeout(stoprecording, 200);
       }}
       style={{ padding: 10 }}
     >
-      <View>
+      <View style={{right:6}}>
         <Icon
           name={recording ? 'mic' : 'mic-outline'}
           size={26}
           family="Ionicons"
-          color={recording ? 'red' : 'black'}
+          color={recording ? 'red' : 'white'}
         />
       </View>
     </TouchableOpacity>

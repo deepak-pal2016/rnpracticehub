@@ -14,16 +14,24 @@ const io = new Server(server, {
 
 let onlineusers = {};
 io.on('connection', socket => {
-//  / console.log('user conneced:', socket.id);
+  //  / console.log('user conneced:', socket.id);
+
+  socket.on('user_typing', data => {
+    io.to(data.recieverId).emit('user_typing', data);
+  });
+
+  // socket.on('user_stop_typing', data => {
+  //     io.to(data.recieverId).emit('user_stop_typing', data);
+  // });
 
   socket.on('user_online', userId => {
     socket.join(userId);
-  //  console.log('JOINED ROOM:', userId);
-  //  console.log('SOCKET ID:', socket.id);
+    //  console.log('JOINED ROOM:', userId);
+    //  console.log('SOCKET ID:', socket.id);
 
     onlineusers[userId] = socket.id;
     //console.log(`user ${userId} joined`);
-   // console.log('ONLINE USERS LIST:', Object.keys(onlineusers));
+    // console.log('ONLINE USERS LIST:', Object.keys(onlineusers));
 
     io.emit('onlineusers', Object.keys(onlineusers));
   });
@@ -31,9 +39,7 @@ io.on('connection', socket => {
   socket.on('sendmessage', async data => {
     try {
       const chat = await Chat.create(data);
-      // reciever ko messge bhejna
       const receiverSocketId = onlineusers[data.receiverId];
-      // console.log('Receiver socket:', receiverSocketId);
       if (receiverSocketId) {
         io.to(receiverSocketId).emit('receivemessage', chat);
       }
@@ -41,16 +47,15 @@ io.on('connection', socket => {
       console.log('err in found', err);
     }
   });
-  // disconenect socket
+
   socket.on('disconnect', () => {
-    console.log('user disconnected', socket.id);
     for (let userId in onlineusers) {
       if (onlineusers[userId] === socket.id) {
         delete onlineusers[userId];
         break;
       }
     }
-  //  console.log('ONLINE USERS LIST:', Object.keys(onlineusers));
+
     io.emit('onlineusers', Object.keys(onlineusers));
   });
 });

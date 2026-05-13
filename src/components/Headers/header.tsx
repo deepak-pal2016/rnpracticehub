@@ -90,8 +90,7 @@ const Header: React.FC<headerProps> = ({
             activeOpacity={0.6}
             disabled={isNavigating}
             onPress={onBackPress ?? (() => navigation.goBack())}
-            style={styles.backiconstyle}
-          >
+            style={styles.backiconstyle} >
             <Icon
               family="FontAwesome6"
               name="chevron-left"
@@ -106,8 +105,7 @@ const Header: React.FC<headerProps> = ({
               styles.headerTitle,
               //@ts-ignore
               title?.length > 33 && Typography.BodyRegular12,
-            ]}
-          >
+            ]} >
             {title}
           </TextView>
         </View>

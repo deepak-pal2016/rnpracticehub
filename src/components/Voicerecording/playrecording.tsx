@@ -54,7 +54,7 @@ const AudioPlayer = ({ url }: { url: string }) => {
 
   return (
     <TouchableOpacity onPress={playAudio}>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center',  }}>
         <Icon
           name={isCurrentPlaying ? 'pause' : 'play'}
           family="Ionicons"
