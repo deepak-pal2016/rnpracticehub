@@ -206,7 +206,7 @@ const Profile: FC = () => {
             />
             <TextView
               style={{
-                color: Colors.PRIMARY[600],
+                color: Colors.SECONDARY[100],
                 ...Typography.BodyRegular13,
                 alignSelf: 'center',
                 left: hp(1),

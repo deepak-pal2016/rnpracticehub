@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-const admin = require('../config/jsonkey/firebase.json')
+const admin = require('../utils/firebase')
 
 const sendNotification = async(token,title,body) => {
     try {

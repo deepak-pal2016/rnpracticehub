@@ -39,10 +39,7 @@ io.on('connection', socket => {
   socket.on('sendmessage', async data => {
     try {
       const chat = await Chat.create(data);
-      const receiverSocketId = onlineusers[data.receiverId];
-      if (receiverSocketId) {
-        io.to(receiverSocketId).emit('receivemessage', chat);
-      }
+      io.to(data.receiverId).emit('receivemessage', chat);
     } catch (err) {
       console.log('err in found', err);
     }

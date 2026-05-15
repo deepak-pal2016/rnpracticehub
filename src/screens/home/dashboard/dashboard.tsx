@@ -130,7 +130,7 @@ const Dashboard: FC = () => {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-      // Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+       Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
       dispatch(Getallusertask(userData?._id));
       await notifee.displayNotification({
         title: remoteMessage.notification?.title,

@@ -27,18 +27,32 @@ const chatStyles = (theme: any) =>
       padding: 8,
       borderTopWidth: 0.5,
       borderColor: '#ccc',
-      backgroundColor:theme.text,
-      justifyContent:'space-evenly'
+      backgroundColor: theme.text,
+      justifyContent: 'space-around',
     },
     inputtext: {
-      flex: 1,
+      // flex: 1,
       marginHorizontal: wp(2.3),
-      backgroundColor: '#f2f2f2',
+      backgroundColor: Colors.SECONDARY[100],
       borderRadius: hp(2),
-      paddingHorizontal: hp(2),
+      width: wp(59),
+      paddingHorizontal: 20,
       paddingVertical: Platform.OS === 'ios' ? 10 : hp(1.8),
       color: '#000',
-      right:hp(.2)
+      right: hp(1.2),
+    },
+    itemwidth: {
+      flexDirection: 'row',
+      marginHorizontal: wp(2.3),
+      // backgroundColor: Colors.SECONDARY[100],
+      borderRadius: hp(2),
+      justifyContent:'center',
+      alignItems:'center',
+      width: wp(28),
+      paddingHorizontal: 20,
+      paddingVertical: Platform.OS === 'ios' ? 10 : hp(.2),
+      color: '#000',
+      right: hp(1.6),
     },
   });
 

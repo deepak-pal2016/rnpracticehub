@@ -56,28 +56,28 @@ const Userchat: FC<any> = props => {
   const [typing, setTyping] = useState<boolean>(false);
   const typingtimeoutRef = useRef<any>(null);
 
- useEffect(() => {
-  const handleTyping = (data: { senderId: any; recieverId: any; }) => {
-    if (
-      String(data.senderId) === String(reciever?._id) &&
-      String(data.recieverId) === String(userData?._id)
-    ) {
-      setTyping(true);
+  useEffect(() => {
+    const handleTyping = (data: { senderId: any; recieverId: any }) => {
+      if (
+        String(data.senderId) === String(reciever?._id) &&
+        String(data.recieverId) === String(userData?._id)
+      ) {
+        setTyping(true);
 
-      if (typingtimeoutRef.current) {
-        clearTimeout(typingtimeoutRef.current);
+        if (typingtimeoutRef.current) {
+          clearTimeout(typingtimeoutRef.current);
+        }
+
+        typingtimeoutRef.current = setTimeout(() => {
+          setTyping(false);
+        }, 1000);
       }
-
-      typingtimeoutRef.current = setTimeout(() => {
-        setTyping(false);
-      }, 1000);
-    }
-  };
-  Socket.on('user_typing', handleTyping);
-  return () => {
-    Socket.off('user_typing', handleTyping);
-  };
-}, [reciever?._id, userData?._id]);
+    };
+    Socket.on('user_typing', handleTyping);
+    return () => {
+      Socket.off('user_typing', handleTyping);
+    };
+  }, [reciever?._id, userData?._id]);
 
   // connet user with cahat
   useEffect(() => {
@@ -89,6 +89,13 @@ const Userchat: FC<any> = props => {
       Socket.off('connect');
     };
   }, []);
+
+  useEffect(() => {
+    if (userData?._id) {
+      Socket.emit('user_online', userData._id);
+      console.log('USER JOINED SOCKET ROOM');
+    }
+  }, [userData?._id]);
 
   useEffect(() => {
     if (chatState?.length) {
@@ -129,7 +136,6 @@ const Userchat: FC<any> = props => {
 
     fetchchat();
   }, [dispatch, userData?._id, reciever?._id]);
-
 
   useEffect(() => {
     Socket.on('receivemessage', msg => {
@@ -177,6 +183,8 @@ const Userchat: FC<any> = props => {
 
   const renderItem = ({ item }: any) => {
     const isMe = item.senderId === userData?._id;
+    console.log(item.mediaUrl, '===');
+
     return (
       <View
         style={{
@@ -295,61 +303,62 @@ const Userchat: FC<any> = props => {
               family="Ionicons"
             />
           </TouchableOpacity> */}
+          <View style={styles.itemwidth}>
+            <Voicerecorder
+              onSend={async (filePath: string) => {
+                const res: any = await APiService.uplaodaudio(filePath);
+                //  console.log('=====3res', res);
 
-          <Voicerecorder
-            onSend={async (filePath: string) => {
-              const res: any = await APiService.uplaodaudio(filePath);
-              //  console.log('=====3res', res);
+                const msg = {
+                  tempId: Date.now().toString(),
+                  senderId: userData?._id,
+                  receiverId: reciever?._id,
+                  messageType: 'audio',
+                  mediaUrl: res.url,
+                  createdAt: new Date().toISOString(),
+                };
 
-              const msg = {
-                tempId: Date.now().toString(),
-                senderId: userData?._id,
-                receiverId: reciever?._id,
-                messageType: 'audio',
-                mediaUrl: res.url,
-                createdAt: new Date().toISOString(),
-              };
-
-              Socket.emit('sendmessage', msg);
-              setMessages(prev => [msg, ...prev]);
-            }}
-          />
-
-          <TouchableOpacity style={{ right: hp(1.2) }}>
-            <Icon
-              name="attach"
-              size={22}
-              color={currentTheme.background}
-              family="Ionicons"
+                Socket.emit('sendmessage', msg);
+                setMessages(prev => [msg, ...prev]);
+              }}
             />
-          </TouchableOpacity>
 
-          <TouchableOpacity style={{ marginLeft: hp(0.7) }}>
-            <Icon
-              name="camera"
-              size={22}
-              color={currentTheme.background}
-              family="Ionicons"
-            />
-          </TouchableOpacity>
+            <TouchableOpacity style={{ right: hp(1.2) }}>
+              <Icon
+                name="attach"
+                size={22}
+                color={currentTheme.background}
+                family="Ionicons"
+              />
+            </TouchableOpacity>
 
-          {/* 😊 */}
-          {/* <TouchableOpacity>
+            <TouchableOpacity style={{ marginLeft: hp(0.7) }}>
+              <Icon
+                name="camera"
+                size={22}
+                color={currentTheme.background}
+                family="Ionicons"
+              />
+            </TouchableOpacity>
+
+            {/* 😊 */}
+            {/* <TouchableOpacity>
             <TextView style={{ fontSize: 18 }}>😊</TextView>
           </TouchableOpacity> */}
 
-          {/* SEND */}
-          <TouchableOpacity
-            onPress={() => sendMessage()}
-            style={styles.sendBtn}
-          >
-            <Icon
-              family="Ionicons"
-              name="send"
-              color={currentTheme.background}
-              size={18}
-            />
-          </TouchableOpacity>
+            {/* SEND */}
+            <TouchableOpacity
+              onPress={() => sendMessage()}
+              style={styles.sendBtn}
+            >
+              <Icon
+                family="Ionicons"
+                name="send"
+                color={currentTheme.background}
+                size={18}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
     </View>
