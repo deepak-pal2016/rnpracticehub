@@ -1,11 +1,11 @@
 const Colors = {
   //color scheme -
   PRIMARY: {
-    100: '#4A90E2', // background, light cards
+    100: '#0FA7A0', // background, light cards
     200: '#2C6ED5', // hover, secondary bg
     300: '#E8F1FD', // buttons
     400: '#7B61FF', // button pressed
-    500: '#36b4b2',
+    500: '#4A90E2',
     600: '#F5A623',
     700: '#fcfcfd',
     800: '#f3f4fa',

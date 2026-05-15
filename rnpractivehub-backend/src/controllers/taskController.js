@@ -44,7 +44,6 @@ const addTask = async (req, res) => {
 
     const assignedUser = await User.findById(userId);
     const assigner = await User.findById(assignedBy);
-    console.log('FCM Token:', assignedUser,'assigner',assigner);
 
     if (tasks) {
       await Notification.create({

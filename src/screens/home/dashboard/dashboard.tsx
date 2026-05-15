@@ -57,13 +57,13 @@ const Dashboard: FC = () => {
   const alltasklist = useSelector(
     (state: any) => state?.getalltask?.data?.data,
   );
-  
+
   const pagesize = alltasklist?.length > 10 ? 5 : 3;
   const { data, loading, hasMore, loadMore } = UsePagination(
     alltasklist,
     pagesize,
   );
-  
+
   const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
   const [tasklist, setTaskList] = useState<any>([]);
   const pendingtask = useMemo(() => {
@@ -130,14 +130,30 @@ const Dashboard: FC = () => {
 
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
-       Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      //  Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
       dispatch(Getallusertask(userData?._id));
+      await notifee.displayNotification({
+        title: remoteMessage.notification?.title,
+        body: remoteMessage.notification?.body,
+
+        android: {
+          channelId: 'default',
+          smallIcon: 'ic_notification',
+          color: '#0A84FF',
+          pressAction: {
+            id: 'default',
+          },
+          importance: 4,
+          sound: 'default',
+        },
+      });
       await notifee.displayNotification({
         title: remoteMessage.notification?.title,
         body: remoteMessage.notification?.body,
         android: {
           channelId: 'default',
-          smallIcon: 'ic_launcher',
+          smallIcon: 'ic_notification',
+          color: Colors.PRIMARY[500],
         },
       });
     });

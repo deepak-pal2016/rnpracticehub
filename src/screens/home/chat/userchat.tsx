@@ -93,7 +93,7 @@ const Userchat: FC<any> = props => {
   useEffect(() => {
     if (userData?._id) {
       Socket.emit('user_online', userData._id);
-      console.log('USER JOINED SOCKET ROOM');
+      // console.log('USER JOINED SOCKET ROOM');
     }
   }, [userData?._id]);
 
@@ -183,7 +183,7 @@ const Userchat: FC<any> = props => {
 
   const renderItem = ({ item }: any) => {
     const isMe = item.senderId === userData?._id;
-    console.log(item.mediaUrl, '===');
+    // console.log(item.mediaUrl, '===');
 
     return (
       <View

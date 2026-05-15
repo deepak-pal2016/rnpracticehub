@@ -8,8 +8,9 @@ import {
   TouchableWithoutFeedback,
   Image,
   FlatList,
+  TouchableOpacity,
 } from 'react-native';
-import React, { FC, useContext, useState } from 'react';
+import React, { FC, useContext, useMemo, useState } from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
 import taskliststyles from '@styles/taskStyles';
@@ -22,6 +23,8 @@ import { DarkTheme, Header, LightTheme, TextView } from '@components/index';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@constant/colors';
 import { cardShadow, Icon, Images, Typography } from '@constant/index';
+import { useSelector } from 'react-redux';
+import moment from 'moment';
 
 type TasklistscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
@@ -33,86 +36,38 @@ const Tasklist: FC = () => {
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = taskliststyles(currentTheme);
-  const [taskprority, setTaskPriority] = useState<any>([
-    { label: 'All', value: 'All' },
-    { label: 'Work', value: 'work' },
-    { label: 'Personal', value: 'personal' },
-    { label: 'Gym', value: 'gym' },
-    { label: 'Study', value: 'study' },
-  ]);
-
-  const [recenttaskArr, setRecentTaskArr] = useState<any>([
-    {
-      nametask: 'Finish report',
-      taskdate: 'May 2025',
-      color: Colors.PRIMARY[100],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Gym Workout',
-      taskdate: 'May 2021',
-      color: Colors.PRIMARY[400],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Buy Groceries',
-      taskdate: 'March 2021',
-      color: Colors.PRIMARY[600],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Complete Project',
-      taskdate: 'March 2026',
-      color: Colors.PRIMARY[300],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Play Cricket',
-      taskdate: 'March 2026',
-      color: Colors.PRIMARY[500],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Learning New',
-      taskdate: 'March 2023',
-      color: Colors.PRIMARY[200],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Complete Project',
-      taskdate: 'March 2026',
-      color: Colors.PRIMARY[700],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Learn Python',
-      taskdate: 'March 2026',
-      color: Colors.PRIMARY[400],
-      userimg: Images.ic_check,
-    },
-    {
-      nametask: 'Go To Market',
-      taskdate: 'March 2026',
-      color: Colors.PRIMARY[800],
-      userimg: Images.ic_check,
-    },
-  ]);
+  const [getselectedid, setGetSelectedId] = useState<any>(0);
+  const alltaskState = useSelector(
+    (state: any) => state?.getalltask?.data?.data || [],
+  );
+  const taskproritys = [
+    'All',
+    ...new Set(alltaskState?.map((item: any) => item?.category)),
+  ];
+  const [recenttaskArr, setRecentTaskArr] = useState<any>(alltaskState);
 
   const searchtask = (keyword: any) => {
     if (!keyword) {
-      setRecentTaskArr(taskprority);
+      setRecentTaskArr(taskproritys);
       return;
     }
-
     const filterdata = recenttaskArr?.filter((item: any) =>
       item?.nametask?.toLowerCase().includes(keyword.toLowerCase()),
     );
-    console.log(filterdata,'filterdata')
     if (filterdata) {
       setRecentTaskArr(filterdata);
-    }else{
-      setRecentTaskArr(recenttaskArr)
+    } else {
+      setRecentTaskArr(recenttaskArr);
     }
+  };
+
+  const findbycategory = (cat: any, index: any) => {
+    setGetSelectedId(index);
+    let data = alltaskState;
+    if (cat !== 'All') {
+      data = alltaskState.filter((item: any) => item?.category === cat);
+    }
+    setRecentTaskArr(data);
   };
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
@@ -133,7 +88,10 @@ const Tasklist: FC = () => {
               width: wp(9),
               height: wp(9),
               resizeMode: 'contain',
-              tintColor: item?.color,
+              tintColor:
+                item?.isCompleted === true
+                  ? Colors.PRIMARY[100]
+                  : item?.priorityColor,
             }}
           />
         </View>
@@ -149,21 +107,35 @@ const Tasklist: FC = () => {
           <TextView
             style={{
               color: Colors.SECONDARY[200],
-              ...Typography.H6Medium16,
+              ...Typography.BodyMedium14,
             }}
           >
-            {item?.nametask}
+            {item?.title}
           </TextView>
+          <View style={{flexDirection:'row', alignItems:'flex-start'}}>
+            <TextView
+              style={{
+                color: Colors.FLOATINGINPUT[100],
+                ...Typography.BodyRegular13,
+                marginTop: hp(0.4),
+              }}
+            >
+              {moment(item?.dueDate).format('DD/MM/YYYY')}
+            </TextView>
 
-          <TextView
-            style={{
-              color: Colors.FLOATINGINPUT[100],
-              ...Typography.BodyRegular13,
-              marginTop: hp(0.4),
-            }}
-          >
-            {item?.taskdate}
-          </TextView>
+            <TextView
+              style={{
+                color:  item?.isCompleted === true
+                  ? Colors.PRIMARY[100]
+                  : item?.priorityColor,
+                ...Typography.BodyRegular13,
+                marginTop: hp(0.4),
+                left:hp(6)
+              }}
+            >
+              {item?.status.charAt(0)?.toUpperCase() + item?.status?.slice(1)}
+            </TextView>
+          </View>
         </View>
         <View
           style={{
@@ -178,18 +150,6 @@ const Tasklist: FC = () => {
             name="more-horizontal"
             size={25}
             color={Colors.SECONDARY[200]}
-          />
-          {/* Right Avatar */}
-          <Image
-            source={Images.ic_uncheck}
-            style={{
-              marginLeft: hp(3),
-              width: wp(9),
-              height: wp(9),
-              // borderRadius: wp(5),
-              resizeMode: 'contain',
-              tintColor: item?.color,
-            }}
           />
         </View>
       </View>
@@ -241,43 +201,51 @@ const Tasklist: FC = () => {
               alignSelf: 'flex-start',
             }}
           >
-            {taskprority?.map((item: any, index: any) => {
+            {taskproritys?.map((item: any, index: any) => {
               return (
-                <View
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => findbycategory(item, index)}
                   key={index}
                   style={[
                     styles.prioritymenu,
                     {
                       backgroundColor:
-                        index === 0 ? Colors.PRIMARY[100] : '#dee3eb',
+                        index === getselectedid
+                          ? Colors.PRIMARY[100]
+                          : '#dee3eb',
                     },
                   ]}
                 >
                   <TextView
                     style={{
                       color:
-                        index === 0
+                        index === getselectedid
                           ? Colors.SECONDARY[100]
                           : Colors.SECONDARY[200],
-                      ...Typography.BodyRegular13,
+                      ...Typography.BodyRegular12,
+                      textAlign: 'center',
                     }}
                   >
                     {' '}
-                    {item?.label}
+                    {item?.charAt(0)?.toUpperCase() + item?.slice(1)}
                   </TextView>
-                </View>
+                </TouchableOpacity>
               );
             })}
           </View>
           <View style={{ marginTop: hp(1) }}>
             <FlatList
               data={recenttaskArr}
-              keyExtractor={(item, index) => index.toString()}
+              keyExtractor={(item, index) =>
+                item?.id?.toString() || index.toString()
+              }
               renderItem={renderItem}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{
-                paddingBottom: hp(5),
-              }}
+              initialNumToRender={10}
+              maxToRenderPerBatch={10}
+              windowSize={7}
+              removeClippedSubviews
             />
           </View>
         </View>

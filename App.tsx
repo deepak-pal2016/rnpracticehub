@@ -69,7 +69,7 @@ const App = () => {
     }
     await messaging().requestPermission();
     const token = await messaging().getToken();
-    console.log('FCM TOKEN', token);
+    // console.log('FCM TOKEN', token);
   };
 
   return (
