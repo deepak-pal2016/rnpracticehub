@@ -321,7 +321,7 @@ const Dashboard: FC = () => {
     >
       <Header
         title="Dashboard"
-        showicons={true}
+        showicons={false}
         screenname="Dashboard"
         showheader={false}
       />

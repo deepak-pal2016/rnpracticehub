@@ -46,7 +46,7 @@ type UserchatscreenNavigationType = NativeStackNavigationProp<
 
 const Userchat: FC<any> = props => {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation<UserchatscreenNavigationType>()
+  const navigation = useNavigation<UserchatscreenNavigationType>();
   const dispatch = useDispatch<AppDispatch>();
   const { reciever } = props.route.params;
   const { showLoader, hideLoader } = CommonLoader();
@@ -65,23 +65,40 @@ const Userchat: FC<any> = props => {
   const [typing, setTyping] = useState<boolean>(false);
   const typingtimeoutRef = useRef<any>(null);
 
-  useEffect(()=>{
-    Socket.on('incoming_call',data => {
-      //@
-      console.log('incoming call to',data);
-        navigation.navigate('VideoCallScreen',{
-          //@ts-ignore
-          callerId:userData?._id,
-          callerName:userData?.name,
-          recieverId:reciever?._id,
-          isIncoming:true
-        })
-    })
+  
+  const startvideocall = () => {
+    Socket.emit('video_call', {
+      callerId: userData?._id,
+      receiverId: reciever?._id,
+      callerName: userData?.name,
+    });
+
+    navigation.navigate('VideoCallScreen', {
+      //@ts-ignore
+      callerId: userData?._id,
+      callerName: userData?.name,
+      receiverId: reciever?._id,
+      isCaller: true,
+    });
+  };
+
+  useEffect(() => {
+    Socket.on('incoming_video_call', data => {
+      console.log(data, 'incoming call');
+
+      navigation.navigate('VideoCallScreen', {
+        //@ts-ignore
+        callerId:data?._id,
+        receiverId: data?._id,
+        callerName: data?.callerName,
+        isReceiver: true,
+      });
+    });
 
     return () => {
-      Socket.off('incoming_call')
-    }
-  },[])
+      Socket.off('incoming_video_call');
+    };
+  }, []);
 
   useEffect(() => {
     const handleTyping = (data: { senderId: any; recieverId: any }) => {
@@ -208,6 +225,7 @@ const Userchat: FC<any> = props => {
   //   setMessages(prev => [msg, ...prev]);
   // };
 
+
   const renderItem = ({ item }: any) => {
     const isMe = item.senderId === userData?._id;
     // console.log(item.mediaUrl, '===');
@@ -273,6 +291,7 @@ const Userchat: FC<any> = props => {
         }`}
         showicons={true}
         receiverid={reciever?._id}
+        onVideocallpress={startvideocall}
       />
 
       <KeyboardAvoidingView
@@ -375,7 +394,8 @@ const Userchat: FC<any> = props => {
           </TouchableOpacity> */}
 
             {/* SEND */}
-            <TouchableOpacity activeOpacity={0.7}
+            <TouchableOpacity
+              activeOpacity={0.7}
               onPress={() => sendMessage()}
               style={styles.sendBtn}
             >

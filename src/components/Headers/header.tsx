@@ -16,9 +16,7 @@ import { showError, showSuccess } from '@components/Flashmessge';
 import { useFormik } from 'formik';
 import { ThemeContext } from '../../context/themeContext';
 import { DarkTheme, LightTheme } from '@components/theme/theme';
-import { RTCView, mediaDevices, MediaStream } from 'react-native-webrtc';
-import Socket from '@services/socket/socket';
-import { UserData, UserDataContext } from '../../context/userDataContext';
+
 
 interface headerProps {
   showicons: boolean;
@@ -28,6 +26,8 @@ interface headerProps {
   onBackPress?: () => void;
   screenname?: string;
   receiverid: any;
+  onVideocallpress?:()=> void
+
 }
 
 const Header: React.FC<headerProps> = ({
@@ -38,39 +38,17 @@ const Header: React.FC<headerProps> = ({
   onBackPress,
   screenname,
   receiverid,
+  onVideocallpress
 }) => {
   const [isNavigating, setIsNavigating] = useState(false);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
-  const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
-  const [stream, setStream] = useState<MediaStream | null>(null);
   const { theme } = useContext(ThemeContext);
   // const { showLoader, hideLoader } = CommonLoader();
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = createStyles(currentTheme);
 
-  useEffect(() => {
-    startCamera();
-  });
-
-  const startCamera = async () => {
-    try {
-      const localstream = await mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
-      console.log(localstream, 'stream');
-      setStream(localstream);
-    } catch (err: any) {}
-  };
-
-  const startvideocall = () => {
-    Socket.emit('video_call', {
-      callerId: userData?._id,
-      receiverId: receiverid,
-      callerName: userData?.name,
-    });
-  };
+ 
 
   return (
     <View
@@ -95,7 +73,7 @@ const Header: React.FC<headerProps> = ({
         //   </View>
         // </TouchableOpacity>
         <View style={styles.usercontainer}>
-          <TouchableOpacity onPress={startvideocall} activeOpacity={0.7} style={styles.radiusview}>
+          <TouchableOpacity onPress={onVideocallpress} activeOpacity={0.7} style={styles.radiusview}>
             <Icon
               family="Ionicons"
               name="videocam-outline"

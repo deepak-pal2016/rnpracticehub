@@ -1,6 +1,8 @@
 {
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
+    "jsx": "react",
+    "jsx": "react",
     "ignoreDeprecations": "6.0",
     "types": ["jest"],
     "baseUrl": "./",

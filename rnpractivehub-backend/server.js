@@ -23,6 +23,26 @@ io.on('connection', socket => {
     io.to(data.recieverId).emit('user_typing', data);
   });
 
+  socket.on('offer', data => {
+    io.to(data?.receiverId).emit('offer', data);
+  });
+
+  socket.on('answer', data => {
+    io.to(data?.receiverId).emit('answer', data);
+  });
+
+  socket.on('video_call', data => {
+    // console.log('video call request', data);
+    io.to(data?.receiverId).emit('incoming_video_call', data);
+  });
+
+  socket.on('ice_candidate',data =>{
+    io.to(data?.receiverId).emit(
+      'ice_candidate',
+      data
+    )
+  })
+
   // socket.on('user_stop_typing', data => {
   //     io.to(data.recieverId).emit('user_stop_typing', data);
   // });

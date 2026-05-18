@@ -112,7 +112,7 @@ const avatarBaseStyle = {
 
   return (
     <View style={styles.container}>
-      <Header showicons={true} screenname="Chat List" showheader={false} />
+      <Header showicons={false} screenname="Friends List" showheader={false} />
       <FlatList
         data={userlistArr}
         keyExtractor={item => item._id}
