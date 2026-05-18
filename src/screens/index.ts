@@ -10,5 +10,6 @@ import Signup from '@screens/auth/register/signup'
 import Taskdetails from "@screens/home/task/taskdetails";
 import Taskstatus from '@screens/home/task/taskstatus';
 import Userchat from "@screens/home/chat/userchat";
+import VideoCallScreen from "@screens/home/videocall/videocallscreen";
 
-export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus,Userchat}
+export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus,Userchat,VideoCallScreen}

@@ -15,10 +15,11 @@ const styles =(theme:any) => StyleSheet.create({
 
   usercontainer: {
     position: 'absolute',
-    top: hp(0),
-    right: wp(0),
+    top: hp(.5),
+    right: wp(2),
     zIndex: 10,
-    alignSelf:'center'
+    alignSelf:'center',
+    flexDirection:'row'
   },
 
   radiusview: {

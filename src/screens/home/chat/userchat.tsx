@@ -35,9 +35,18 @@ import type { AppDispatch } from '../../../redux/store';
 import { showError, showSuccess } from '@components/Flashmessge';
 import APiService from '@services/apiservice';
 import AudioPlayer from '@components/Voicerecording/playrecording';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { HomeStackProps } from 'src/@types';
+import { useNavigation } from '@react-navigation/native';
+
+type UserchatscreenNavigationType = NativeStackNavigationProp<
+  HomeStackProps,
+  'Userchat'
+>;
 
 const Userchat: FC<any> = props => {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<UserchatscreenNavigationType>()
   const dispatch = useDispatch<AppDispatch>();
   const { reciever } = props.route.params;
   const { showLoader, hideLoader } = CommonLoader();
@@ -55,6 +64,24 @@ const Userchat: FC<any> = props => {
   const isonlineuser = onlineusers.includes(String(reciever?._id));
   const [typing, setTyping] = useState<boolean>(false);
   const typingtimeoutRef = useRef<any>(null);
+
+  useEffect(()=>{
+    Socket.on('incoming_call',data => {
+      //@
+      console.log('incoming call to',data);
+        navigation.navigate('VideoCallScreen',{
+          //@ts-ignore
+          callerId:userData?._id,
+          callerName:userData?.name,
+          recieverId:reciever?._id,
+          isIncoming:true
+        })
+    })
+
+    return () => {
+      Socket.off('incoming_call')
+    }
+  },[])
 
   useEffect(() => {
     const handleTyping = (data: { senderId: any; recieverId: any }) => {
@@ -82,7 +109,7 @@ const Userchat: FC<any> = props => {
   // connet user with cahat
   useEffect(() => {
     Socket.on('connect', () => {
-      console.log('Socket connected:', Socket.id);
+      // console.log('Socket connected:', Socket.id);
     });
 
     return () => {
@@ -244,7 +271,8 @@ const Userchat: FC<any> = props => {
         title={`${reciever?.name || 'User'} \n ${
           typing ? 'typing...' : isonlineuser ? 'online' : 'offline'
         }`}
-        showicons={false}
+        showicons={true}
+        receiverid={reciever?._id}
       />
 
       <KeyboardAvoidingView
@@ -347,7 +375,7 @@ const Userchat: FC<any> = props => {
           </TouchableOpacity> */}
 
             {/* SEND */}
-            <TouchableOpacity
+            <TouchableOpacity activeOpacity={0.7}
               onPress={() => sendMessage()}
               style={styles.sendBtn}
             >

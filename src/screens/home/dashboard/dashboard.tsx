@@ -139,21 +139,12 @@ const Dashboard: FC = () => {
         android: {
           channelId: 'default',
           smallIcon: 'ic_notification',
-          color: '#0A84FF',
+          color: Colors.PRIMARY[100],
           pressAction: {
             id: 'default',
           },
           importance: 4,
           sound: 'default',
-        },
-      });
-      await notifee.displayNotification({
-        title: remoteMessage.notification?.title,
-        body: remoteMessage.notification?.body,
-        android: {
-          channelId: 'default',
-          smallIcon: 'ic_notification',
-          color: Colors.PRIMARY[500],
         },
       });
     });

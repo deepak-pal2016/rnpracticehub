@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
-import { Dashboard, Notification, Taskdetails, Tasklist, Taskstatus, Userchat } from '@screens/index';
+import { Dashboard, Notification, Taskdetails, Tasklist, Taskstatus, Userchat, VideoCallScreen } from '@screens/index';
 import BottomTabNavigator from '../navigation/bottomtabnavigator';
 import Colors from '@constant/colors';
 import Typography from '@constant/fontSize';
@@ -48,6 +48,19 @@ const Homestacknavigator: FC = () => {
         options={{
           headerShown:false,
           headerTitle:'Chats',
+          headerTitleStyle:{
+            color:Colors.SECONDARY[200],
+            ...Typography.BodyRegular13
+          },
+        }}
+      />
+
+       <HomeStack.Screen
+        name="VideoCallScreen"
+        component={VideoCallScreen}
+        options={{
+          headerShown:false,
+          headerTitle:'Video Call',
           headerTitleStyle:{
             color:Colors.SECONDARY[200],
             ...Typography.BodyRegular13

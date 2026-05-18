@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { View, TouchableOpacity } from 'react-native';
 import createStyles from '@styles/headerStyles';
 import { Colors, Icon, Typography } from '@constant/index';
@@ -16,6 +16,9 @@ import { showError, showSuccess } from '@components/Flashmessge';
 import { useFormik } from 'formik';
 import { ThemeContext } from '../../context/themeContext';
 import { DarkTheme, LightTheme } from '@components/theme/theme';
+import { RTCView, mediaDevices, MediaStream } from 'react-native-webrtc';
+import Socket from '@services/socket/socket';
+import { UserData, UserDataContext } from '../../context/userDataContext';
 
 interface headerProps {
   showicons: boolean;
@@ -24,6 +27,7 @@ interface headerProps {
   flexview?: number;
   onBackPress?: () => void;
   screenname?: string;
+  receiverid: any;
 }
 
 const Header: React.FC<headerProps> = ({
@@ -33,50 +37,82 @@ const Header: React.FC<headerProps> = ({
   title,
   onBackPress,
   screenname,
+  receiverid,
 }) => {
   const [isNavigating, setIsNavigating] = useState(false);
   const navigation = useNavigation();
   const dispatch = useAppDispatch();
+  const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const { theme } = useContext(ThemeContext);
   // const { showLoader, hideLoader } = CommonLoader();
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = createStyles(currentTheme);
-  const logoutdata = async () => {
-    // showLoader();
-    // dispatch(Signout())
-    //   .unwrap()
-    //   .then((resp: any) => {
-    //     hideLoader();
-    //     if (resp?.success === true) {
-    //       dispatch(Logout());
-    //       showSuccess('Logout Successfully..');
-    //     } else {
-    //       showError('Something went wrong please try again.');
-    //     }
-    //   })
-    //   .catch(err => {
-    //     hideLoader();
-    //     console.log('Logout error:', err);
-    //   });
+
+  useEffect(() => {
+    startCamera();
+  });
+
+  const startCamera = async () => {
+    try {
+      const localstream = await mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+      console.log(localstream, 'stream');
+      setStream(localstream);
+    } catch (err: any) {}
+  };
+
+  const startvideocall = () => {
+    Socket.emit('video_call', {
+      callerId: userData?._id,
+      receiverId: receiverid,
+      callerName: userData?.name,
+    });
   };
 
   return (
-    <View style={[styles.container, { flex: flexview, backgroundColor:Colors.PRIMARY[700] }]}>
+    <View
+      style={[
+        styles.container,
+        { flex: flexview, backgroundColor: Colors.PRIMARY[700] },
+      ]}
+    >
       {showicons && (
-        <TouchableOpacity
-          activeOpacity={0.6}
-          onPress={()=> navigation.navigate('Notification')}
-          style={styles.usercontainer}
-        >
-          <View style={styles.radiusview}>
+        // <TouchableOpacity
+        //   activeOpacity={0.6}
+        //   onPress={()=> navigation.navigate('Notification')}
+        //   style={styles.usercontainer}
+        // >
+        //   <View style={styles.radiusview}>
+        //     <Icon
+        //       family="Ionicons"
+        //       name="notifications-outline"
+        //       size={26}
+        //       color={currentTheme?.text}
+        //     />
+        //   </View>
+        // </TouchableOpacity>
+        <View style={styles.usercontainer}>
+          <TouchableOpacity onPress={startvideocall} activeOpacity={0.7} style={styles.radiusview}>
             <Icon
               family="Ionicons"
-              name="notifications-outline"
-              size={26}
-              color={currentTheme?.text}
+              name="videocam-outline"
+              size={22}
+              color={Colors.SECONDARY[200]}
             />
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+
+          <TouchableOpacity activeOpacity={0.7} style={styles.radiusview}>
+            <Icon
+              family="Ionicons"
+              name="call-outline"
+              size={22}
+              color={Colors.SECONDARY[200]}
+            />
+          </TouchableOpacity>
+        </View>
       )}
       {screenname && (
         <View style={styles.screenNameWrapper}>
@@ -90,13 +126,13 @@ const Header: React.FC<headerProps> = ({
             activeOpacity={0.6}
             disabled={isNavigating}
             onPress={onBackPress ?? (() => navigation.goBack())}
-            style={styles.backiconstyle} >
+            style={styles.backiconstyle}
+          >
             <Icon
               family="FontAwesome6"
               name="chevron-left"
               color={currentTheme?.text}
               size={20}
-              
             />
           </TouchableOpacity>
 
@@ -105,7 +141,8 @@ const Header: React.FC<headerProps> = ({
               styles.headerTitle,
               //@ts-ignore
               title?.length > 33 && Typography.BodyRegular12,
-            ]} >
+            ]}
+          >
             {title}
           </TextView>
         </View>

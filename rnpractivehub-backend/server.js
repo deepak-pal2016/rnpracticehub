@@ -78,7 +78,7 @@ io.on('connection', socket => {
               notification: {
                 channelId: 'default',
                 sound: 'default',
-                smallIcon: 'ic_notification',
+                // smallIcon: 'ic_notification',
                 color: '#36b4b2',
               },
             },

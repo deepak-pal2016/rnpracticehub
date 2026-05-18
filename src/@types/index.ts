@@ -19,5 +19,8 @@ export type HomeStackProps = {
   Userchat: {
     reciever: any;
   };
+  VideoCallScreen:{
+    data:any
+  }
 
 }

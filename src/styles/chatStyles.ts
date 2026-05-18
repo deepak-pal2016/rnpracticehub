@@ -14,7 +14,7 @@ const chatStyles = (theme: any) =>
 
     sendBtn: {
       marginLeft: 10,
-      backgroundColor: Colors.PRIMARY[500],
+      backgroundColor: Colors.PRIMARY[100],
       width: 40,
       height: 40,
       borderRadius: 20,

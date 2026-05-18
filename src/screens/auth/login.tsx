@@ -213,7 +213,7 @@ const Login: FC = () => {
             title={'SIGN IN'}
             gradientColors={[
               Colors.PRIMARY[100],
-              Colors.PRIMARY[200],
+              Colors.PRIMARY[100],
               Colors.PRIMARY[300],
             ]}
           />
