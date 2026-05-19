@@ -65,7 +65,6 @@ const Userchat: FC<any> = props => {
   const [typing, setTyping] = useState<boolean>(false);
   const typingtimeoutRef = useRef<any>(null);
 
-  
   const startvideocall = () => {
     Socket.emit('video_call', {
       callerId: userData?._id,
@@ -78,20 +77,19 @@ const Userchat: FC<any> = props => {
       callerId: userData?._id,
       callerName: userData?.name,
       receiverId: reciever?._id,
+      receiverName: reciever?.name,
       isCaller: true,
     });
   };
 
   useEffect(() => {
     Socket.on('incoming_video_call', data => {
-      console.log(data, 'incoming call');
-
-      navigation.navigate('VideoCallScreen', {
+      // console.log(data, 'incoming call');
+      navigation.navigate('IncomingCallScreen', {
         //@ts-ignore
-        callerId:data?._id,
-        receiverId: data?._id,
+        callerId: data?.callerId,
+        receiverId: userData?._id,
         callerName: data?.callerName,
-        isReceiver: true,
       });
     });
 
@@ -196,7 +194,6 @@ const Userchat: FC<any> = props => {
 
   const sendMessage = () => {
     if (!text.trim()) return;
-    console.log('Socket connected:', Socket.connected);
     const msg = {
       tempId: Date.now().toString(),
       senderId: userData?._id,
@@ -224,7 +221,6 @@ const Userchat: FC<any> = props => {
   //   Socket.emit('sendmessage', msg);
   //   setMessages(prev => [msg, ...prev]);
   // };
-
 
   const renderItem = ({ item }: any) => {
     const isMe = item.senderId === userData?._id;

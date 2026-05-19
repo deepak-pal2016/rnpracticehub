@@ -17,7 +17,7 @@ const io = new Server(server, {
 let onlineusers = {};
 app.set('onlineusers', onlineusers);
 io.on('connection', socket => {
-  //  / console.log('user conneced:', socket.id);
+  console.log('user conneced:', socket.id);
 
   socket.on('user_typing', data => {
     io.to(data.recieverId).emit('user_typing', data);
@@ -28,7 +28,20 @@ io.on('connection', socket => {
   });
 
   socket.on('answer', data => {
+    console.log('answer', data);
+
     io.to(data?.receiverId).emit('answer', data);
+  });
+
+  socket.on('call_accepted', data => {
+    console.log('CALL ACCEPTED =>', data);
+    const callerSocketId = onlineusers[data.callerId];
+
+    console.log('caller socket =>', callerSocketId);
+
+    if (callerSocketId) {
+      io.to(callerSocketId).emit('call_accepted');
+    }
   });
 
   socket.on('video_call', data => {
@@ -36,16 +49,10 @@ io.on('connection', socket => {
     io.to(data?.receiverId).emit('incoming_video_call', data);
   });
 
-  socket.on('ice_candidate',data =>{
-    io.to(data?.receiverId).emit(
-      'ice_candidate',
-      data
-    )
-  })
-
-  // socket.on('user_stop_typing', data => {
-  //     io.to(data.recieverId).emit('user_stop_typing', data);
-  // });
+  socket.on('ice_candidate', data => {
+    console.log('ICE =>', data.receiverId);
+    io.to(data?.receiverId).emit('ice_candidate', data);
+  });
 
   socket.on('user_online', userId => {
     socket.join(userId);
@@ -58,15 +65,6 @@ io.on('connection', socket => {
 
     io.emit('onlineusers', Object.keys(onlineusers));
   });
-
-  // socket.on('sendmessage', async data => {
-  //   try {
-  //     const chat = await Chat.create(data);
-  //     io.to(data.receiverId).emit('receivemessage', chat);
-  //   } catch (err) {
-  //     console.log('err in found', err);
-  //   }
-  // });
 
   socket.on('sendmessage', async data => {
     try {
@@ -99,7 +97,7 @@ io.on('connection', socket => {
                 channelId: 'default',
                 sound: 'default',
                 // smallIcon: 'ic_notification',
-                color: '#36b4b2',
+                color: 'transparent',
               },
             },
           });

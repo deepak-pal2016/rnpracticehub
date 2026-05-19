@@ -19,12 +19,13 @@ const styles =(theme:any) => StyleSheet.create({
     right: wp(2),
     zIndex: 10,
     alignSelf:'center',
-    flexDirection:'row'
+    flexDirection:'row',
+    justifyContent:'space-evenly'
   },
 
   radiusview: {
     paddingVertical: hp(2.5),
-    paddingHorizontal: hp(3),
+    paddingHorizontal: hp(2),
     justifyContent: 'center',
     alignItems: 'center',
     // backgroundColor: Colors.PRIMARY[800],

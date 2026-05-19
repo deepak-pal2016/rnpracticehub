@@ -22,5 +22,8 @@ export type HomeStackProps = {
   VideoCallScreen:{
     data:any
   }
+  IncomingCallScreen:{
+    data:any
+  }
 
 }

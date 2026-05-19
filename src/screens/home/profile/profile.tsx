@@ -111,7 +111,7 @@ const Profile: FC = () => {
         },
       ]}
     >
-      <Header showheader={true} title="Profile" showicons={true} />
+      <Header showheader={true} title="Profile" showicons={false} />
       <View style={{ marginTop: hp(0) }}>
         <View style={styles.conentview}>
           <View>

@@ -1,19 +1,21 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, {useEffect} from 'react';
-import {Provider} from 'react-redux';
-import {store} from '@redux/store/store';
+import React, { useEffect } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '@redux/store/store';
 import Route from './src/routes/index';
-import {CommonAlertProvider} from '@components/CommonAlertModal/commonAlertModal';
-import {CommonLoaderProvider} from '@components/CommonLoader/commonLoader';
-import {ThemeProvider} from './src/context/index';
+import { CommonAlertProvider } from '@components/CommonAlertModal/commonAlertModal';
+import { CommonLoaderProvider } from '@components/CommonLoader/commonLoader';
+import { ThemeProvider } from './src/context/index';
 import FlashMessage from 'react-native-flash-message';
-import {UserDataContextProvider} from './src/context/index';
-import {LogBox, PermissionsAndroid, Platform} from 'react-native';
+import { UserDataContextProvider } from './src/context/index';
+import { LogBox, PermissionsAndroid, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import Appwrapwer from './src/context/appwrapper';
 import notifee from '@notifee/react-native';
-import {request} from 'react-native-permissions';
+import { Provider as PaperProvider } from 'react-native-paper';
+
+import { MenuProvider } from 'react-native-popup-menu';
 
 LogBox.ignoreLogs(['InteractionManager has been deprecated']);
 
@@ -33,15 +35,12 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = messaging().onNotificationOpenedApp(
-      remoteMessage => {
-        console.log('App opened from background:', remoteMessage);
-      },
-    );
+    const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
+      console.log('App opened from background:', remoteMessage);
+    });
     return unsubscribe;
   }, []);
 
-  
   useEffect(() => {
     const unsubscribe = messaging().onMessage(async remoteMessage => {
       console.log('FOREGROUND MESSAGE', remoteMessage);
@@ -66,25 +65,27 @@ const App = () => {
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
       );
+      // console.log('granted', granted);
     }
-    await messaging().requestPermission();
-    const token = await messaging().getToken();
-    // console.log('FCM TOKEN', token);
   };
 
   return (
     <Provider store={store}>
-      <ThemeProvider>
-        <UserDataContextProvider>
-          <CommonLoaderProvider>
-            <CommonAlertProvider>
-              <Appwrapwer />
-              <Route />
-              <FlashMessage position="bottom" />
-            </CommonAlertProvider>
-          </CommonLoaderProvider>
-        </UserDataContextProvider>
-      </ThemeProvider>
+      <PaperProvider>
+        <ThemeProvider>
+          <MenuProvider>
+            <UserDataContextProvider>
+              <CommonLoaderProvider>
+                <CommonAlertProvider>
+                  <Appwrapwer />
+                  <Route />
+                  <FlashMessage position="bottom" />
+                </CommonAlertProvider>
+              </CommonLoaderProvider>
+            </UserDataContextProvider>
+          </MenuProvider>
+        </ThemeProvider>
+      </PaperProvider>
     </Provider>
   );
 };

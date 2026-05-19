@@ -77,7 +77,7 @@ const Header: React.FC<headerProps> = ({
             <Icon
               family="Ionicons"
               name="videocam-outline"
-              size={22}
+              size={23}
               color={Colors.SECONDARY[200]}
             />
           </TouchableOpacity>
@@ -86,7 +86,7 @@ const Header: React.FC<headerProps> = ({
             <Icon
               family="Ionicons"
               name="call-outline"
-              size={22}
+              size={23}
               color={Colors.SECONDARY[200]}
             />
           </TouchableOpacity>

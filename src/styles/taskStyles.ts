@@ -14,7 +14,7 @@ const taskStyles = (theme: any) =>
     searchcontainer: {
       width: wp(85),
       alignSelf: 'center',
-      height: hp(6.5),
+      height: hp(7),
       borderColor: Colors.FLOATINGINPUT[100],
       borderWidth: hp(0.1),
       borderRadius: hp(1.8),

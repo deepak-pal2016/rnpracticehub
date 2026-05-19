@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/self-closing-comp */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -10,7 +11,14 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import React, { FC, useContext, useMemo, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
 import taskliststyles from '@styles/taskStyles';
@@ -19,12 +27,20 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from '@constant/dimentions';
-import { DarkTheme, Header, LightTheme, TextView } from '@components/index';
+import {
+  CommonLoader,
+  DarkTheme,
+  Header,
+  LightTheme,
+  TextView,
+} from '@components/index';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@constant/colors';
 import { cardShadow, Icon, Images, Typography } from '@constant/index';
 import { useSelector } from 'react-redux';
 import moment from 'moment';
+import { Menu, Divider } from 'react-native-paper';
+import debounce from 'lodash/debounce';
 
 type TasklistscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
@@ -36,7 +52,10 @@ const Tasklist: FC = () => {
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = taskliststyles(currentTheme);
+  const { showLoader, hideLoader } = CommonLoader();
+  const [visible, setVisible] = useState<any>(false);
   const [getselectedid, setGetSelectedId] = useState<any>(0);
+  const [menuid, setMenuId] = useState<any>('');
   const alltaskState = useSelector(
     (state: any) => state?.getalltask?.data?.data || [],
   );
@@ -46,20 +65,45 @@ const Tasklist: FC = () => {
   ];
   const [recenttaskArr, setRecentTaskArr] = useState<any>(alltaskState);
 
-  const searchtask = (keyword: any) => {
-    if (!keyword) {
-      setRecentTaskArr(taskproritys);
+  const searchtask = useCallback(
+    (keyword: string) => {
+      if (!keyword?.trim()) {
+        setRecentTaskArr(alltaskState);
+        return;
+      }
+      showLoader();
+      const filterdata = alltaskState?.filter((item: any) =>
+        item?.title?.toLowerCase().includes(keyword?.toLowerCase()),
+      );
+      hideLoader();
+      setRecentTaskArr(filterdata);
+    },
+    [alltaskState],
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncesearch.cancel();
+    };
+    //@ts-ignore
+  }, [debouncesearch]);
+
+  const debouncesearch = useMemo(
+    () => debounce(searchtask, 500),
+    [alltaskState],
+  );
+
+  const openMenu = (id: any) => {
+    if (!id) {
       return;
     }
-    const filterdata = recenttaskArr?.filter((item: any) =>
-      item?.nametask?.toLowerCase().includes(keyword.toLowerCase()),
-    );
-    if (filterdata) {
-      setRecentTaskArr(filterdata);
-    } else {
-      setRecentTaskArr(recenttaskArr);
+    setMenuId(id);
+    if (id === menuid) {
+      setVisible(true);
     }
   };
+
+  const closeMenu = () => setVisible(false);
 
   const findbycategory = (cat: any, index: any) => {
     setGetSelectedId(index);
@@ -112,7 +156,7 @@ const Tasklist: FC = () => {
           >
             {item?.title}
           </TextView>
-          <View style={{flexDirection:'row', alignItems:'flex-start'}}>
+          <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
             <TextView
               style={{
                 color: Colors.FLOATINGINPUT[100],
@@ -125,33 +169,61 @@ const Tasklist: FC = () => {
 
             <TextView
               style={{
-                color:  item?.isCompleted === true
-                  ? Colors.PRIMARY[100]
-                  : item?.priorityColor,
+                color:
+                  item?.isCompleted === true
+                    ? Colors.PRIMARY[100]
+                    : item?.priorityColor,
                 ...Typography.BodyRegular13,
                 marginTop: hp(0.4),
-                left:hp(6)
+                left: hp(6),
               }}
             >
               {item?.status.charAt(0)?.toUpperCase() + item?.status?.slice(1)}
             </TextView>
           </View>
         </View>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-evenly',
-            paddingHorizontal: hp(1),
-          }}
+        <Menu
+          visible={visible}
+          onDismiss={closeMenu}
+          anchor={
+            <TouchableOpacity
+              onPress={() => openMenu(index)}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-evenly',
+                paddingHorizontal: hp(1),
+              }}
+            >
+              <Icon
+                family="Feather"
+                name="more-horizontal"
+                size={25}
+                color={Colors.SECONDARY[200]}
+              />
+            </TouchableOpacity>
+          }
         >
-          <Icon
-            family="Feather"
-            name="more-horizontal"
-            size={25}
-            color={Colors.SECONDARY[200]}
+          <Menu.Item
+            onPress={() => {
+              closeMenu();
+              console.log('Edit');
+            }}
+            title="Edit"
+            leadingIcon="pencil"
           />
-        </View>
+
+          <Divider />
+
+          <Menu.Item
+            onPress={() => {
+              closeMenu();
+              console.log('Delete');
+            }}
+            title="Delete"
+            leadingIcon="delete"
+          />
+        </Menu>
       </View>
     );
   };
@@ -167,9 +239,9 @@ const Tasklist: FC = () => {
         },
       ]}
     >
-      <Header showheader={true} showicons={true} title="Task List" />
+      <Header showheader={true} showicons={false} title="Task List" />
       <TouchableWithoutFeedback>
-        <View style={{ marginTop: hp(2), flex: 1 }}>
+        <View style={{ marginTop: hp(1), flex: 1 }}>
           <View style={styles.searchcontainer}>
             <View
               style={{
@@ -185,10 +257,11 @@ const Tasklist: FC = () => {
                 size={22}
               />
               <TextInput
-                placeholder="Search tasks"
+                placeholder="Search task"
                 placeholderTextColor={Colors?.FLOATINGINPUT[400]}
                 style={styles.searchinput}
-                onChangeText={(text: any) => searchtask(text)}
+                //@ts-ignore
+                onChangeText={(text: any) => debouncesearch(text)}
               />
             </View>
           </View>
@@ -246,6 +319,7 @@ const Tasklist: FC = () => {
               maxToRenderPerBatch={10}
               windowSize={7}
               removeClippedSubviews
+              contentContainerStyle={{ paddingBottom: hp(20) }}
             />
           </View>
         </View>
