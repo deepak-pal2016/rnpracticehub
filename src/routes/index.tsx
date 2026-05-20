@@ -23,6 +23,8 @@ import { AppDispatch } from '@redux/store/store';
 import messaging from '@react-native-firebase/messaging';
 import notifee from '@notifee/react-native';
 import Socket from '@services/socket/socket';
+import { navigationRef } from '../utils/NavigationService';
+
 
 const Route: FC = () => {
   const [userLogin, setUserLogin] = useState<any>(undefined);
@@ -128,7 +130,7 @@ const Route: FC = () => {
   //
   return (
     <>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <StatusBar barStyle={'default'} backgroundColor={Colors.PRIMARY[100]} />
         <SafeAreaView style={{ flex: 1 }}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>

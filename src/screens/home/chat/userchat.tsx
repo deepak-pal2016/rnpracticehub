@@ -37,7 +37,7 @@ import APiService from '@services/apiservice';
 import AudioPlayer from '@components/Voicerecording/playrecording';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 type UserchatscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
@@ -81,7 +81,7 @@ const Userchat: FC<any> = props => {
       isCaller: true,
     });
   };
-
+  
   useEffect(() => {
     Socket.on('incoming_video_call', data => {
       // console.log(data, 'incoming call');

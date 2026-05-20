@@ -1,7 +1,16 @@
 import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
-import { Dashboard, IncomingCallScreen, Notification, Taskdetails, Tasklist, Taskstatus, Userchat, VideoCallScreen } from '@screens/index';
+import {
+  Dashboard,
+  IncomingCallScreen,
+  Notification,
+  Taskdetails,
+  Tasklist,
+  Taskstatus,
+  Userchat,
+  VideoCallScreen,
+} from '@screens/index';
 import BottomTabNavigator from '../navigation/bottomtabnavigator';
 import Colors from '@constant/colors';
 import Typography from '@constant/fontSize';
@@ -23,9 +32,9 @@ const Homestacknavigator: FC = () => {
         options={{
           headerShown: true,
           headerTitle: 'Task Details',
-          headerTitleStyle:{
-            color:Colors.SECONDARY[200],
-            ...Typography.BodyRegular13
+          headerTitleStyle: {
+            color: Colors.SECONDARY[200],
+            ...Typography.BodyRegular13,
           },
         }}
       />
@@ -34,49 +43,49 @@ const Homestacknavigator: FC = () => {
         component={Taskstatus}
         options={{
           headerShown: true,
-          headerTitle:'Mark Task Status',
-          headerTitleStyle:{
-            color:Colors.SECONDARY[200],
-            ...Typography.BodyRegular13
+          headerTitle: 'Mark Task Status',
+          headerTitleStyle: {
+            color: Colors.SECONDARY[200],
+            ...Typography.BodyRegular13,
           },
         }}
       />
 
-        <HomeStack.Screen
+      <HomeStack.Screen
         name="Userchat"
         component={Userchat}
         options={{
-          headerShown:false,
-          headerTitle:'Chats',
-          headerTitleStyle:{
-            color:Colors.SECONDARY[200],
-            ...Typography.BodyRegular13
+          headerShown: false,
+          headerTitle: 'Chats',
+          headerTitleStyle: {
+            color: Colors.SECONDARY[200],
+            ...Typography.BodyRegular13,
           },
         }}
       />
 
-       <HomeStack.Screen
+      <HomeStack.Screen
         name="VideoCallScreen"
         component={VideoCallScreen}
         options={{
-          headerShown:false,
-          headerTitle:'Video Call',
-          headerTitleStyle:{
-            color:Colors.SECONDARY[200],
-            ...Typography.BodyRegular13
+          headerShown: false,
+          headerTitle: 'Video Call',
+          headerTitleStyle: {
+            color: Colors.SECONDARY[200],
+            ...Typography.BodyRegular13,
           },
         }}
       />
 
-       <HomeStack.Screen
+      <HomeStack.Screen
         name="IncomingCallScreen"
         component={IncomingCallScreen}
         options={{
-          headerShown:false,
-          headerTitle:'Receiving Video call',
-          headerTitleStyle:{
-            color:Colors.SECONDARY[200],
-            ...Typography.BodyRegular13
+          headerShown: false,
+          headerTitle: 'Receiving Video call',
+          headerTitleStyle: {
+            color: Colors.SECONDARY[200],
+            ...Typography.BodyRegular13,
           },
         }}
       />

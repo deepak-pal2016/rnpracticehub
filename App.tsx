@@ -12,9 +12,9 @@ import { UserDataContextProvider } from './src/context/index';
 import { LogBox, PermissionsAndroid, Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import Appwrapwer from './src/context/appwrapper';
-import notifee from '@notifee/react-native';
+import notifee, { EventType } from '@notifee/react-native';
 import { Provider as PaperProvider } from 'react-native-paper';
-
+import { navigationRef } from './src/utils/NavigationService';
 import { MenuProvider } from 'react-native-popup-menu';
 
 LogBox.ignoreLogs(['InteractionManager has been deprecated']);
@@ -36,28 +36,61 @@ const App = () => {
 
   useEffect(() => {
     const unsubscribe = messaging().onNotificationOpenedApp(remoteMessage => {
-      console.log('App opened from background:', remoteMessage);
+      const data = remoteMessage?.data;
+
+      if (data?.screen === 'Userchat') {
+        //@ts-ignore
+        navigationRef.navigate('Userchat', {
+          reciever: {
+            _id: data?._id,
+            name: data?.name,
+          },
+        });
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    const unsubscribe = notifee.onForegroundEvent(({ type, detail }) => {
+      if (type === EventType.PRESS) {
+        const data = detail.notification?.data;
+        if (data?.screen === 'Userchat') {
+          //@ts-ignore
+          navigationRef.navigate('Userchat', {
+            reciever: {
+              _id: data?._id,
+              name: data?.name,
+            },
+          });
+        }
+      }
     });
     return unsubscribe;
   }, []);
 
   useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('FOREGROUND MESSAGE', remoteMessage);
+    async function checkInitialNotification() {
+      const initialNotification:any = await notifee.getInitialNotification();
+      const data = initialNotification?.notification?.data;
+      if (data?.screen === "Userchat") {
+        const interval = setInterval(() => {
+          if (navigationRef.isReady()) {
+            clearInterval(interval);
+            //@ts-ignore
+            navigationRef.navigate('Userchat', {
+              reciever: {
+                _id: data?._id,
+                name: data?.name,
+              },
+            });
+          }
+        }, 500);
+      }
+    }
 
-      await notifee.displayNotification({
-        title: remoteMessage.notification?.title,
-        body: remoteMessage.notification?.body,
-        android: {
-          channelId: 'default',
-          pressAction: {
-            id: 'default',
-          },
-        },
-      });
-    });
-
-    return unsubscribe;
+    checkInitialNotification();
   }, []);
 
   const requestpermission = async () => {

@@ -17,7 +17,7 @@ const io = new Server(server, {
 let onlineusers = {};
 app.set('onlineusers', onlineusers);
 io.on('connection', socket => {
-  console.log('user conneced:', socket.id);
+  // console.log('user conneced:', socket.id);
 
   socket.on('user_typing', data => {
     io.to(data.recieverId).emit('user_typing', data);
@@ -28,16 +28,16 @@ io.on('connection', socket => {
   });
 
   socket.on('answer', data => {
-    console.log('answer', data);
+    // console.log('answer', data);
 
     io.to(data?.receiverId).emit('answer', data);
   });
 
   socket.on('call_accepted', data => {
-    console.log('CALL ACCEPTED =>', data);
+    // console.log('CALL ACCEPTED =>', data);
     const callerSocketId = onlineusers[data.callerId];
 
-    console.log('caller socket =>', callerSocketId);
+    // console.log('caller socket =>', callerSocketId);
 
     if (callerSocketId) {
       io.to(callerSocketId).emit('call_accepted');
@@ -50,7 +50,7 @@ io.on('connection', socket => {
   });
 
   socket.on('ice_candidate', data => {
-    console.log('ICE =>', data.receiverId);
+    // console.log('ICE =>', data.receiverId);
     io.to(data?.receiverId).emit('ice_candidate', data);
   });
 
@@ -68,39 +68,37 @@ io.on('connection', socket => {
 
   socket.on('sendmessage', async data => {
     try {
-      // SAVE MESSAGE
       const chat = await Chat.create(data);
       io.to(data.receiverId).emit('receivemessage', chat);
       const receiverSocketId = onlineusers[data.receiverId];
       if (!receiverSocketId) {
         const user = await User.findById(data.receiverId);
+        const senderuser = await User.findById(data.senderId);
         if (user?.fcmtoken) {
-          const response = await admin.messaging().send({
-            token: user.fcmtoken,
-            notification: {
-              title: 'You have a new message',
-              body:
-                data.message?.length > 70
-                  ? data.message.slice(0, 70) + '...'
-                  : data.message || 'Audio message',
-            },
-
-            data: {
-              senderId: String(data.senderId),
-              receiverId: String(data.receiverId),
-              type: 'chat',
-            },
-
-            android: {
-              priority: 'high',
-              notification: {
-                channelId: 'default',
-                sound: 'default',
-                // smallIcon: 'ic_notification',
-                color: 'transparent',
+          try {
+            const payload = {
+              token: user.fcmtoken,
+              data: {
+                title: 'You have a new message',
+                body:
+                  data?.message?.length > 70
+                    ? `${data.message.slice(0, 70)}...`
+                    : data?.message || 'Audio message',
+                senderId: String(data?.senderId || ''),
+                receiverId: String(data?.receiverId || ''),
+                type: 'chat',
+                screen: 'Userchat',
+                _id: String(senderuser?._id || ''),
+                name: senderuser?.name || '',
               },
-            },
-          });
+              android: {
+                priority: 'high',
+              },
+            };
+            const response = await admin.messaging().send(payload);
+          } catch (error) {
+            console.log('FCM Send Error:', error);
+          }
         }
       }
     } catch (err) {
