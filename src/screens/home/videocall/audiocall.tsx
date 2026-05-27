@@ -11,8 +11,17 @@ import {
   RTCPeerConnection,
   RTCSessionDescription,
 } from 'react-native-webrtc';
+import { HomeStackProps } from 'src/@types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useNavigation } from '@react-navigation/native';
 
-const Audiocall: FC<any> = ({ route, navigation }) => {
+type AudiocallscreenNavigationType = NativeStackNavigationProp<
+  HomeStackProps,
+  'Audiocall'
+>;
+
+const Audiocall: FC<any> = ({ route }) => {
+  const navigation = useNavigation<AudiocallscreenNavigationType>();
   const callData = route?.params || {};
   const [localStream, setLocalStream] = useState<any>(null);
   const isCaller = callData?.isCaller;
@@ -225,14 +234,16 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.rejectBtn]}
-              onPress={rejectAudioCall} >
+              onPress={rejectAudioCall}
+            >
               <Text style={styles.btnText}>Decline</Text>
             </TouchableOpacity>
 
             {!isConnected && (
               <TouchableOpacity
                 style={[styles.button, styles.acceptBtn]}
-                onPress={acceptAudioCall}>
+                onPress={acceptAudioCall}
+              >
                 <TextView style={styles.btnText}>Accept</TextView>
               </TouchableOpacity>
             )}

@@ -28,5 +28,6 @@ export type HomeStackProps = {
   IncomingCallScreen:{
     data:any
   }
+  
 
 }

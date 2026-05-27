@@ -42,7 +42,6 @@ const VideoCallScreen: FC = () => {
     }),
   ).current;
 
-  // ---------------- INIT ----------------
   useEffect(() => {
     initCall();
 
