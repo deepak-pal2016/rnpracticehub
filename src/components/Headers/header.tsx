@@ -27,6 +27,7 @@ interface headerProps {
   screenname?: string;
   receiverid: any;
   onVideocallpress?:()=> void
+  onAudiocallpress?:() => void
 
 }
 
@@ -38,7 +39,8 @@ const Header: React.FC<headerProps> = ({
   onBackPress,
   screenname,
   receiverid,
-  onVideocallpress
+  onVideocallpress,
+  onAudiocallpress
 }) => {
   const [isNavigating, setIsNavigating] = useState(false);
   const navigation = useNavigation();
@@ -82,7 +84,7 @@ const Header: React.FC<headerProps> = ({
             />
           </TouchableOpacity>
 
-          <TouchableOpacity activeOpacity={0.7} style={styles.radiusview}>
+          <TouchableOpacity onPress={onAudiocallpress} activeOpacity={0.7} style={styles.radiusview}>
             <Icon
               family="Ionicons"
               name="call-outline"

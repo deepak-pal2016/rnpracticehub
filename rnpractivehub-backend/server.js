@@ -44,6 +44,47 @@ io.on('connection', socket => {
     }
   });
 
+  socket.on('audio_call', data => {
+    const { callerId, receiverId, callerName } = data;
+    const recieverid = onlineusers[receiverId];
+    if (recieverid) {
+      io.to(recieverid).emit('incoming_audio_call', {
+        callerId,
+        receiverId,
+        callerName,
+      });
+    }
+  });
+
+  socket.on('accept_audio_call', data => {
+    const callersocketid = onlineusers[data?.callerId];
+    io.to(callersocketid).emit('audio_call_accepted', data);
+  });
+
+  socket.on('audio_offer', data => {
+    const revieversockeitid = onlineusers[data?.receiverId];
+    if (revieversockeitid) {
+      io.to(revieversockeitid).emit('audio_offer_received', data);
+    }
+  });
+
+  socket.on('audio_answer', data => {
+    //console.log('AUDIO ANSWER =>', data);
+    const callersocketid = onlineusers[data?.callerId];
+    // console.log('CALLER SOCKET ID =>', callersocketid);
+    if (callersocketid) {
+      io.to(callersocketid).emit('audio_answer_received', data);
+      //console.log('ANSWER SENT TO CALLER');
+    }
+  });
+
+  socket.on('audio_ice_candidate', data => {
+    const recieversocketid = onlineusers[data?.receiverId];
+    if (recieversocketid) {
+      io.to(recieversocketid).emit('audio_ice_candidate', data);
+    }
+  });
+
   socket.on('video_call', data => {
     // console.log('video call request', data);
     io.to(data?.receiverId).emit('incoming_video_call', data);

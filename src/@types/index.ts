@@ -16,6 +16,9 @@ export type HomeStackProps = {
   Addtask:undefined;
   Taskdetails:undefined;
   Taskstatus:undefined;
+  Audiocall:{
+     data:any
+  };
   Userchat: {
     reciever: any;
   };

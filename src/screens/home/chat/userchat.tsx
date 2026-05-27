@@ -63,8 +63,75 @@ const Userchat: FC<any> = props => {
   const onlineusers = useSelector((state: any) => state?.onlineuser?.users);
   const isonlineuser = onlineusers.includes(String(reciever?._id));
   const [typing, setTyping] = useState<boolean>(false);
+  const [incomingcall, setIncomingCall] = useState<any>('');
   const typingtimeoutRef = useRef<any>(null);
 
+  //audio call code
+  const startAudiocall = () => {
+    if (!userData?._id || !reciever?._id) return;
+
+    Socket.emit('audio_call', {
+      callerId: userData._id,
+      receiverId: reciever._id,
+      callerName: userData.name,
+      receiverName: reciever.name,
+      type: 'audio',
+    });
+
+    console.log('Audio calling...');
+    // navigation.navigate('Audiocall', {
+    //   //@ts-ignore
+    //   callerId: userData._id,
+    //   callerName: userData.name,
+    //   receiverId: reciever._id,
+    //   receiverName: reciever.name,
+    //   isCaller: true,
+    //   callType: 'audio',
+    // });
+  };
+
+  useEffect(() => {
+    const handleacceptcall = async () => {
+      console.log('audi call accepted');
+      await startAudiocall();
+
+      navigation.navigate('Audiocall', {
+        //@ts-ignore
+        callerId: userData?._id,
+        callerName: userData?.name,
+        receiverId: reciever?._id,
+        receiverName: reciever?.name,
+        isCaller: true,
+      });
+    };
+
+    Socket.on('audio_call_accepted', handleacceptcall);
+    return () => {
+      Socket.off('audio_call_accepted', handleacceptcall);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleIncomingAudiocall = (data: any) => {
+      console.log('incoming audio call', data);
+      // setIncomingCall(data);
+      navigation.navigate('Audiocall', {
+        //@ts-ignore
+        callerId: data?.callerId,
+        callerName: data?.callerName,
+        receiverId: data?.receiverId,
+        isCaller: false,
+        incomingCall: true,
+        callType: 'audio',
+      });
+    };
+    Socket.on('incoming_audio_call', handleIncomingAudiocall);
+    return () => {
+      Socket.off('incoming_audio_call', handleIncomingAudiocall);
+    };
+  }, []);
+
+  // video call code
   const startvideocall = () => {
     Socket.emit('video_call', {
       callerId: userData?._id,
@@ -81,7 +148,7 @@ const Userchat: FC<any> = props => {
       isCaller: true,
     });
   };
-  
+
   useEffect(() => {
     Socket.on('incoming_video_call', data => {
       // console.log(data, 'incoming call');
@@ -150,9 +217,9 @@ const Userchat: FC<any> = props => {
     }
   }, [chatState]);
 
-  useEffect(() => {
-    flatlistRef.current?.scrollToEnd({ animated: true });
-  }, [messages]);
+  // useEffect(() => {
+  //   flatlistRef.current?.scrollToEnd({ animated: true });
+  // }, [messages]);
 
   useEffect(() => {
     const fetchchat = async () => {
@@ -288,6 +355,7 @@ const Userchat: FC<any> = props => {
         showicons={true}
         receiverid={reciever?._id}
         onVideocallpress={startvideocall}
+        onAudiocallpress={startAudiocall}
       />
 
       <KeyboardAvoidingView
@@ -306,13 +374,17 @@ const Userchat: FC<any> = props => {
             inverted
             ref={flatlistRef}
             onContentSizeChange={() =>
-              flatlistRef.current?.scrollToOffset({ offset: 0 })
+              flatlistRef.current?.scrollToOffset({
+                offset: 0,
+                animated: false,
+              })
             }
             showsVerticalScrollIndicator={false}
+            maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
             keyboardShouldPersistTaps="handled"
             contentContainerStyle={{
               paddingTop: hp(2),
-              paddingBottom: hp(7),
+              paddingBottom: hp(14),
             }}
           />
         </View>

@@ -11,6 +11,7 @@ import Taskdetails from "@screens/home/task/taskdetails";
 import Taskstatus from '@screens/home/task/taskstatus';
 import Userchat from "@screens/home/chat/userchat";
 import VideoCallScreen from "@screens/home/videocall/videocallscreen";
-import IncomingCallScreen from "./home/videocall/incomingvideocall";
+import IncomingCallScreen from "@screens/home/videocall/incomingvideocall";
+import Audiocall from "@screens/home/videocall/audiocall";
 
-export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus,Userchat,VideoCallScreen,IncomingCallScreen}
+export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus,Userchat,VideoCallScreen,IncomingCallScreen,Audiocall}

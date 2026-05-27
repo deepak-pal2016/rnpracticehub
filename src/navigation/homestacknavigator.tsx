@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
 import {
+  Audiocall,
   Dashboard,
   IncomingCallScreen,
   Notification,
@@ -83,6 +84,19 @@ const Homestacknavigator: FC = () => {
         options={{
           headerShown: false,
           headerTitle: 'Receiving Video call',
+          headerTitleStyle: {
+            color: Colors.SECONDARY[200],
+            ...Typography.BodyRegular13,
+          },
+        }}
+      />
+
+      <HomeStack.Screen
+        name="Audiocall"
+        component={Audiocall}
+        options={{
+          headerShown: false,
+          headerTitle: 'Receiving Audio call',
           headerTitleStyle: {
             color: Colors.SECONDARY[200],
             ...Typography.BodyRegular13,
