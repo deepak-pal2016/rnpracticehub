@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-native/no-inline-styles */
-
+import InCallManager from 'react-native-incall-manager';
 import { TextView } from '@components/index';
 import Socket from '@services/socket/socket';
 import React, { FC, useRef, useState, useEffect } from 'react';
@@ -21,7 +21,6 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
   const [callTime, setCallTime] = useState<any>(0);
   const timerRef = useRef<any>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  console.log(route, 'route===');
 
   const startCalltimer = () => {
     timerRef.current = setInterval(() => {
@@ -29,6 +28,15 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
     }, 1000);
   };
 
+  useEffect(() => {
+    if (!isCaller && incomingCall && !isConnected) {
+      InCallManager.startRingtone();
+    }
+
+    return () => {
+      InCallManager.stopRingtone();
+    };
+  }, [isCaller, incomingCall, isConnected]);
   const peerconnection: any = useRef(
     new RTCPeerConnection({
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
@@ -156,6 +164,8 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
 
   const acceptAudioCall = async () => {
     await startAudioStream(false);
+    InCallManager.start({ media: 'audio' });
+    InCallManager.stopRingtone();
 
     Socket.emit('accept_audio_call', {
       callerId: callData?.callerId,
@@ -165,6 +175,7 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
   };
 
   const rejectAudioCall = () => {
+    InCallManager.stopRingtone();
     Socket.emit('reject_audio_call', {
       callerId: callData?.callerId,
     });
@@ -177,6 +188,8 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
     localStream?.getTracks()?.forEach((track: any) => {
       track.stop();
     });
+    InCallManager.stopRingtone();
+    InCallManager.stop();
     setLocalStream(null);
     navigation.goBack();
   };
@@ -204,7 +217,7 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
                 .padStart(2, '0')}`
             : isCaller
             ? 'Calling...'
-            : 'Incoming Audio Call...'}
+            : 'Incoming Call...'}
         </TextView>
 
         {/* Receiver Side */}
@@ -212,16 +225,14 @@ const Audiocall: FC<any> = ({ route, navigation }) => {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={[styles.button, styles.rejectBtn]}
-              onPress={rejectAudioCall}
-            >
+              onPress={rejectAudioCall} >
               <Text style={styles.btnText}>Decline</Text>
             </TouchableOpacity>
 
             {!isConnected && (
               <TouchableOpacity
                 style={[styles.button, styles.acceptBtn]}
-                onPress={acceptAudioCall}
-              >
+                onPress={acceptAudioCall}>
                 <TextView style={styles.btnText}>Accept</TextView>
               </TouchableOpacity>
             )}
