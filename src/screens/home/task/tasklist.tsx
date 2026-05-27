@@ -37,10 +37,12 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@constant/colors';
 import { cardShadow, Icon, Images, Typography } from '@constant/index';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { Menu, Divider } from 'react-native-paper';
 import debounce from 'lodash/debounce';
+import { AppDispatch } from '@redux/store/store';
+import { Deletetaskbyid } from '@redux/slices/taskSlice';
 
 type TasklistscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
@@ -49,6 +51,7 @@ type TasklistscreenNavigationType = NativeStackNavigationProp<
 
 const Tasklist: FC = () => {
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch<AppDispatch>();
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = taskliststyles(currentTheme);
@@ -81,6 +84,11 @@ const Tasklist: FC = () => {
     [alltaskState],
   );
 
+  const debouncesearch = useMemo(
+    () => debounce(searchtask, 500),
+    [alltaskState],
+  );
+
   useEffect(() => {
     return () => {
       debouncesearch.cancel();
@@ -88,22 +96,15 @@ const Tasklist: FC = () => {
     //@ts-ignore
   }, [debouncesearch]);
 
-  const debouncesearch = useMemo(
-    () => debounce(searchtask, 500),
-    [alltaskState],
-  );
-
   const openMenu = (id: any) => {
-    if (!id) {
-      return;
-    }
     setMenuId(id);
-    if (id === menuid) {
-      setVisible(true);
-    }
+    setVisible(true);
   };
 
-  const closeMenu = () => setVisible(false);
+  const closeMenu = () => {
+    setVisible(false);
+    setMenuId(null);
+  };
 
   const findbycategory = (cat: any, index: any) => {
     setGetSelectedId(index);
@@ -112,6 +113,18 @@ const Tasklist: FC = () => {
       data = alltaskState.filter((item: any) => item?.category === cat);
     }
     setRecentTaskArr(data);
+  };
+
+  const deletetask = async (item: any) => {
+    try {
+      showLoader();
+      var resp: any = await dispatch(Deletetaskbyid(item?._id));
+      console.log(resp, '===');
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      hideLoader();
+    }
   };
 
   const renderItem = ({ item, index }: { item: any; index: number }) => {
@@ -183,7 +196,7 @@ const Tasklist: FC = () => {
           </View>
         </View>
         <Menu
-          visible={visible}
+          visible={visible && menuid === index}
           onDismiss={closeMenu}
           anchor={
             <TouchableOpacity
@@ -217,8 +230,7 @@ const Tasklist: FC = () => {
 
           <Menu.Item
             onPress={() => {
-              closeMenu();
-              console.log('Delete');
+              deletetask(item);
             }}
             title="Delete"
             leadingIcon="delete"

@@ -146,14 +146,13 @@ const completetask = async (req, res) => {
         data: task,
       });
       const assigner = await User.findById(task.assignedBy);
-      if(assigner){
+      if (assigner) {
         await sendNotification(
           assigner?.fcmtoken,
           'Task Completed',
-          `${req.user.name} completed the task ${task.title}`
-        )
-        console.log(assigner,'caalignt his fuctnion');
-        
+          `${req.user.name} completed the task ${task.title}`,
+        );
+        console.log(assigner, 'caalignt his fuctnion');
       }
     }
   } catch (err) {
@@ -165,4 +164,29 @@ const completetask = async (req, res) => {
   }
 };
 
-module.exports = { addTask, getUserTask, completetask };
+const deletetaskbyid = async (req, res) => {
+  try {
+    const { taskid } = req.query;
+    console.log( req, 'delteid');
+
+    const deletetask = await Task.deleteOne({ _id: taskid });
+    if (deletetask.deletedCount > 0) {
+      return res.status(200).json({
+        status: true,
+        message: 'Task delete successfully..',
+      });
+    }
+    return res.status(404).json({
+      status: false,
+      message: 'Task not found',
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      status: false,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+module.exports = { addTask, getUserTask, completetask, deletetaskbyid };

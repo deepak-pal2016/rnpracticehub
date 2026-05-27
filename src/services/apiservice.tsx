@@ -105,6 +105,10 @@ const APiService = {
       throw error;
     }
   },
+  deletetaskbyid: async (payload: any) => {
+    const headers = await headersdata(true);
+    return APIKit.get(`deletetask?taskid=${payload}`, { headers });
+  },
 };
 
 export default APiService;

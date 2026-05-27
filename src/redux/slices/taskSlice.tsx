@@ -6,6 +6,10 @@ import { APiService } from '@services/index';
 import { create } from 'lodash';
 import { Task } from 'react-native';
 
+interface Deletetaskprops {
+  taskid?: any;
+}
+
 interface TaskProps {
   title: string;
   description: string;
@@ -63,7 +67,21 @@ export const Markedcompletetask = createAsyncThunk<
   { rejectValue: string }
 >('markedcompletetask', async (body, { rejectWithValue }) => {
   try {
-    const resp:any = await APiService.markedcompletetask(body);
+    const resp: any = await APiService.markedcompletetask(body);
+    return resp?.data;
+  } catch (error: any) {
+    return rejectWithValue(
+      error?.response?.data?.message || 'Something went wrong',
+    );
+  }
+});
+export const Deletetaskbyid = createAsyncThunk<
+  Deletetaskprops,
+  any,
+  { rejectValue: string }
+>('deletetaskid', async (body, { rejectWithValue }) => {
+  try {
+    const resp: any = await APiService.deletetaskbyid(body);
     return resp?.data;
   } catch (error: any) {
     return rejectWithValue(
@@ -132,9 +150,9 @@ const TaskSlice = createSlice({
 });
 
 const MarkedcompletetaskSlice = createSlice({
-  name:'makedcompletetask',
+  name: 'makedcompletetask',
   initialState: markedtaskInitialState,
-  reducers:{},
+  reducers: {},
   extraReducers(builder) {
     builder.addCase(Markedcompletetask.pending, state => {
       state.isLoader = true;
@@ -154,6 +172,31 @@ const MarkedcompletetaskSlice = createSlice({
   },
 });
 
+const TaskdeleteSlice = createSlice({
+  name: 'deletetask',
+  initialState: markedtaskInitialState,
+  reducers: {},
+  extraReducers(builder) {
+    builder.addCase(Deletetaskbyid.pending, state => {
+      state.isLoader = true;
+      state.isError = false;
+    });
+    builder.addCase(
+      Deletetaskbyid.fulfilled,
+      (state, action: PayloadAction<Deletetaskprops>) => {
+        state.isLoader = false;
+        //@ts-ignore
+        state.data = action.payload;
+      },
+    ),
+      builder.addCase(Deletetaskbyid.rejected, state => {
+        state.isLoader = false;
+        state.isError = true;
+      });
+  },
+});
+
 export const AddtaskReducers = TaskSlice.reducer;
 export const GetalltaskReducers = GetalltaskSlice.reducer;
-export const MarkedcompletedtaskReducers = MarkedcompletetaskSlice.reducer
+export const MarkedcompletedtaskReducers = MarkedcompletetaskSlice.reducer;
+export const DeletetaskReducers = TaskdeleteSlice.reducer
