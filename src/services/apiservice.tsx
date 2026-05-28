@@ -76,7 +76,7 @@ const APiService = {
     return APIKit.post('getuserchats', payload, { headers });
   },
 
-  logout: async (payload: any) => {
+  logout: async () => {
     const headers = await headersdata(true);
     return APIKit.post('logoutuser', {}, { headers });
   },
@@ -105,9 +105,9 @@ const APiService = {
       throw error;
     }
   },
-  deletetaskbyid: async (payload: any) => {
+  deletetaskbyid: async (taskId: string) => {
     const headers = await headersdata(true);
-    return APIKit.get(`deletetask?taskid=${payload}`, { headers });
+    return APIKit.delete(`deletetask/${taskId}`, { headers });
   },
 };
 

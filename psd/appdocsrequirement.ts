@@ -1,42 +1,42 @@
 // // // Authentication System
 
-// // // Login Screen
+// // // Login Screen = task done
 
-// // // Signup Screen
+// // // Signup Screen = task done
 
-// // // Logout
+// // // Logout = task done
 
-// // // Token store (AsyncStorage)
-// // // Skills show hongi:
+// // // Token store (AsyncStorage) = task done
+// // // Skills show hongi: 
 
-// // // API integration
+// // // API integration = task done but pending some api
 
-// // // Auth flow
+// // // Auth flow task done
 
-// // // Secure storage
-// // 2️⃣ Dashboard Screen
+// // // Secure storage  task done
+// // 2️⃣ Dashboard Screen task done
 
-// // User login hone ke baad dashboard dekhega.
+// // User login hone ke baad dashboard dekhega. task done.
 
 // // Features:
 
-// // Total tasks
+// // Total tasks task done
 
-// // Completed tasks
+// // Completed tasks task done
 
-// // Pending tasks
+// // Pending tasks task done
 
 // // Today's tasks
 
-// // 3️⃣ Task Management
+// // 3️⃣ Task Management task done
 
-// // User task create kar sake.
+// // User task create kar sake. task done
 
 // // Features:
 
-// // Add Task
+// // Add Task task done
 
-// // Edit Task
+// // Edit Task not
 
 // // Delete Task
 

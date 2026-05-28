@@ -166,9 +166,7 @@ const completetask = async (req, res) => {
 
 const deletetaskbyid = async (req, res) => {
   try {
-    const { taskid } = req.query;
-    console.log( req, 'delteid');
-
+    const { taskid } = req.params;
     const deletetask = await Task.deleteOne({ _id: taskid });
     if (deletetask.deletedCount > 0) {
       return res.status(200).json({
@@ -176,13 +174,15 @@ const deletetaskbyid = async (req, res) => {
         message: 'Task delete successfully..',
       });
     }
+
     return res.status(404).json({
       status: false,
       message: 'Task not found',
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
+    console.log(err);
+
+    return res.status(500).json({
       status: false,
       message: 'Internal Server Error',
     });

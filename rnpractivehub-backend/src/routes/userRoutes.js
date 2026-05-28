@@ -27,6 +27,6 @@ router.post('/getuserchats', authMiddleware, getuserchats);
 router.post('/loginuser', loginUser);
 router.post('/logoutuser', authMiddleware, logout);
 router.post('/upload', upload.single('file'), uploadAudio);
-router.get('/deletetask/:taskid', authMiddleware, deletetaskbyid);
+router.delete('/deletetask/:taskid', authMiddleware, deletetaskbyid);
 
 module.exports = router;

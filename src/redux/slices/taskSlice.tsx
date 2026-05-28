@@ -76,13 +76,13 @@ export const Markedcompletetask = createAsyncThunk<
   }
 });
 export const Deletetaskbyid = createAsyncThunk<
-  Deletetaskprops,
   any,
+  string,
   { rejectValue: string }
->('deletetaskid', async (body, { rejectWithValue }) => {
+>('deletetaskbyid', async (taskId, { rejectWithValue }) => {
   try {
-    const resp: any = await APiService.deletetaskbyid(body);
-    return resp?.data;
+    const resp: any = await APiService.deletetaskbyid(taskId);
+    return resp.data;
   } catch (error: any) {
     return rejectWithValue(
       error?.response?.data?.message || 'Something went wrong',
@@ -199,4 +199,4 @@ const TaskdeleteSlice = createSlice({
 export const AddtaskReducers = TaskSlice.reducer;
 export const GetalltaskReducers = GetalltaskSlice.reducer;
 export const MarkedcompletedtaskReducers = MarkedcompletetaskSlice.reducer;
-export const DeletetaskReducers = TaskdeleteSlice.reducer
+export const DeletetaskReducers = TaskdeleteSlice.reducer;

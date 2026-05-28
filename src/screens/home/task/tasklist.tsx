@@ -42,7 +42,9 @@ import moment from 'moment';
 import { Menu, Divider } from 'react-native-paper';
 import debounce from 'lodash/debounce';
 import { AppDispatch } from '@redux/store/store';
-import { Deletetaskbyid } from '@redux/slices/taskSlice';
+import { Deletetaskbyid, Getallusertask } from '@redux/slices/taskSlice';
+import { UserData, UserDataContext } from '../../../context/userDataContext';
+import { showError, showSuccess } from '@components/Flashmessge';
 
 type TasklistscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
@@ -57,6 +59,7 @@ const Tasklist: FC = () => {
   const styles = taskliststyles(currentTheme);
   const { showLoader, hideLoader } = CommonLoader();
   const [visible, setVisible] = useState<any>(false);
+  const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
   const [getselectedid, setGetSelectedId] = useState<any>(0);
   const [menuid, setMenuId] = useState<any>('');
   const alltaskState = useSelector(
@@ -118,10 +121,20 @@ const Tasklist: FC = () => {
   const deletetask = async (item: any) => {
     try {
       showLoader();
-      var resp: any = await dispatch(Deletetaskbyid(item?._id));
-      console.log(resp, '===');
+      const resp = await dispatch(Deletetaskbyid(item?._id));
+      if (resp?.payload?.status === true) {
+        dispatch(Getallusertask(userData?._id));
+        showSuccess('Task delete successfully..');
+        setRecentTaskArr((prev: any) =>
+          prev.filter((task: any) => task?._id !== item?._id),
+        );
+        closeMenu();
+      } else {
+        showError('Task not delete please try again');
+      }
     } catch (error: any) {
-      console.log(error);
+      console.log(error, 'logout error');
+      showError(error?.message || 'Something went wrong');
     } finally {
       hideLoader();
     }
@@ -217,17 +230,7 @@ const Tasklist: FC = () => {
             </TouchableOpacity>
           }
         >
-          <Menu.Item
-            onPress={() => {
-              closeMenu();
-              console.log('Edit');
-            }}
-            title="Edit"
-            leadingIcon="pencil"
-          />
-
           <Divider />
-
           <Menu.Item
             onPress={() => {
               deletetask(item);
