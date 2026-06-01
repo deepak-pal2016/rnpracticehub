@@ -54,7 +54,7 @@ type TaskstatusscreenNavigationType = NativeStackNavigationProp<
 >;
 
 const Taskstatus: FC = ({ route }: any) => {
-  const navigation = useNavigation<TaskstatusscreenNavigationType>()
+  const navigation = useNavigation<TaskstatusscreenNavigationType>();
   const { showLoader, hideLoader } = CommonLoader();
   const dispatch = useDispatch<any>();
   const insets = useSafeAreaInsets();
@@ -104,9 +104,9 @@ const Taskstatus: FC = ({ route }: any) => {
         hideLoader();
         if (response?.status === true) {
           showSuccess(response?.message || 'Task marked as completed');
-          dispatch(Getallusertask(userData?._id))
+          dispatch(Getallusertask(userData?._id));
           resetForm();
-            navigation.popToTop();
+          navigation.popToTop();
         } else {
           showError(
             response?.message || 'Sorry try again something went wrong...',
@@ -277,12 +277,13 @@ const Taskstatus: FC = ({ route }: any) => {
             ? moment(values.taskdate, 'YYYY-MM-DD').toDate()
             : new Date()
         }
-        minimumDate={new Date()}
+        minimumDate={moment().startOf('day').toDate()}
         mode="date"
         onConfirm={date => {
           setFromDatePickerOpen(false);
           const formatted = moment(date).format('YYYY-MM-DD');
           setFieldValue('taskdate', formatted);
+           console.log('Selected Date =>', formatted)
         }}
         onCancel={() => setFromDatePickerOpen(false)}
       />

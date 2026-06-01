@@ -57,13 +57,12 @@ const Taskdetails: FC = ({ route }: any) => {
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = addtaskStyles(currentTheme);
   const task: any = route.params?.detailstask;
-  console.log(task, '=2=2=2=');
 
   return (
     <ScrollView style={styles.containertaskdtails}>
       <View
         style={{
-          backgroundColor: Colors.WHITE,
+          backgroundColor: Colors.SECONDARY[100],
           borderRadius: 12,
           padding: wp(4),
           margin: wp(3),

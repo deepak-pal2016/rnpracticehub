@@ -20,6 +20,7 @@ import {
   Header,
   LightTheme,
   TextView,
+  Attachment,
   Voicerecorder,
 } from '@components/index';
 import { cardShadow, Colors, Icon, Typography } from '@constant/index';
@@ -38,6 +39,8 @@ import AudioPlayer from '@components/Voicerecording/playrecording';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { pick } from '@react-native-documents/picker';
 
 type UserchatscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
@@ -56,6 +59,7 @@ const Userchat: FC<any> = props => {
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = chatStyles(currentTheme);
+  const [showAttachmentModal, setShowAttachmentModal] = useState(false);
   const chatState = useSelector(
     (state: any) => state?.fetchchat?.data?.data || [],
   );
@@ -274,6 +278,55 @@ const Userchat: FC<any> = props => {
     setText('');
   };
 
+  const pickGallery = async () => {
+    try {
+      const response = await launchImageLibrary({
+        mediaType: 'mixed',
+        selectionLimit: 1,
+      });
+
+      if (response.assets?.length) {
+        console.log(response.assets[0]);
+
+        // upload api call
+        // const res = await APiService.uploadfile(response.assets[0])
+
+        setShowAttachmentModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const openCamera = async () => {
+    try {
+      const response = await launchCamera({
+        mediaType: 'photo',
+        cameraType: 'back',
+      });
+
+      if (response.assets?.length) {
+        console.log(response.assets[0]);
+
+        setShowAttachmentModal(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const pickDocument = async () => {
+    try {
+      const [file] = await pick();
+
+      console.log(file);
+
+      setShowAttachmentModal(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // const sendAudioMessage = (filePath: string) => {
   //   const msg = {
   //     tempId: Date.now().toString(),
@@ -438,7 +491,10 @@ const Userchat: FC<any> = props => {
               }}
             />
 
-            <TouchableOpacity style={{ right: hp(1.2) }}>
+            <TouchableOpacity
+              onPress={() => setShowAttachmentModal(true)}
+              style={{ right: hp(1.2) }}
+            >
               <Icon
                 name="attach"
                 size={22}
@@ -447,7 +503,10 @@ const Userchat: FC<any> = props => {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ marginLeft: hp(0.7) }}>
+            <TouchableOpacity
+              onPress={() => setShowAttachmentModal(true)}
+              style={{ marginLeft: hp(0.7) }}
+            >
               <Icon
                 name="camera"
                 size={22}
@@ -475,6 +534,20 @@ const Userchat: FC<any> = props => {
               />
             </TouchableOpacity>
           </View>
+          <Attachment
+            visible={showAttachmentModal}
+            onClose={() => setShowAttachmentModal(false)}
+            onGallery={pickGallery}
+            onCamera={openCamera}
+            onDocument={pickDocument}
+            onLocation={() => {
+              setShowAttachmentModal(false);
+            } }
+            onContact={() => {
+              setShowAttachmentModal(false);
+            } } icon={''} title={''} color={''} onPress={function (): void {
+              throw new Error('Function not implemented.');
+            } } family={undefined}          />
         </View>
       </KeyboardAvoidingView>
     </View>

@@ -19,6 +19,7 @@ import DividerWithText from '@components/DividerWithText/DividerWithText';
 import { LightTheme } from '@components/theme/theme';
 import { DarkTheme } from '@components/theme/theme';
 import Voicerecorder from '@components/Voicerecording/voicerecording';
+import Attachment from '@components/Chatatachement/attachment';
 
 export {
   TextView,
@@ -40,7 +41,8 @@ export {
   DividerWithText,
   DarkTheme,
   LightTheme,
-  Voicerecorder
+  Voicerecorder,
+  Attachment
   
   
 };
