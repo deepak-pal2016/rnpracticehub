@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   Platform,
   KeyboardAvoidingView,
+  Image,
+  PermissionsAndroid,
+  Alert,
 } from 'react-native';
 import React, { FC, useState, useEffect, useContext, useRef } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -40,7 +43,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { pick } from '@react-native-documents/picker';
+import { pick, types } from '@react-native-documents/picker';
 
 type UserchatscreenNavigationType = NativeStackNavigationProp<
   HomeStackProps,
@@ -60,6 +63,7 @@ const Userchat: FC<any> = props => {
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = chatStyles(currentTheme);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<any>([]);
   const chatState = useSelector(
     (state: any) => state?.fetchchat?.data?.data || [],
   );
@@ -83,15 +87,6 @@ const Userchat: FC<any> = props => {
     });
 
     console.log('Audio calling...');
-    // navigation.navigate('Audiocall', {
-    //   //@ts-ignore
-    //   callerId: userData._id,
-    //   callerName: userData.name,
-    //   receiverId: reciever._id,
-    //   receiverName: reciever.name,
-    //   isCaller: true,
-    //   callType: 'audio',
-    // });
   };
 
   useEffect(() => {
@@ -118,7 +113,6 @@ const Userchat: FC<any> = props => {
   useEffect(() => {
     const handleIncomingAudiocall = (data: any) => {
       console.log('incoming audio call', data);
-      // setIncomingCall(data);
       navigation.navigate('Audiocall', {
         //@ts-ignore
         callerId: data?.callerId,
@@ -155,7 +149,6 @@ const Userchat: FC<any> = props => {
 
   useEffect(() => {
     Socket.on('incoming_video_call', data => {
-      // console.log(data, 'incoming call');
       navigation.navigate('IncomingCallScreen', {
         //@ts-ignore
         callerId: data?.callerId,
@@ -192,7 +185,6 @@ const Userchat: FC<any> = props => {
     };
   }, [reciever?._id, userData?._id]);
 
-  // connet user with cahat
   useEffect(() => {
     Socket.on('connect', () => {
       // console.log('Socket connected:', Socket.id);
@@ -206,7 +198,6 @@ const Userchat: FC<any> = props => {
   useEffect(() => {
     if (userData?._id) {
       Socket.emit('user_online', userData._id);
-      // console.log('USER JOINED SOCKET ROOM');
     }
   }, [userData?._id]);
 
@@ -216,14 +207,10 @@ const Userchat: FC<any> = props => {
         const ids = new Set(prev.map(m => m._id));
         //@ts-ignore
         const newData = chatState.filter(m => !ids.has(m._id));
-        return [...prev, ...newData];
+        return [...prev, ...[...newData].reverse()];
       });
     }
   }, [chatState]);
-
-  // useEffect(() => {
-  //   flatlistRef.current?.scrollToEnd({ animated: true });
-  // }, [messages]);
 
   useEffect(() => {
     const fetchchat = async () => {
@@ -235,9 +222,7 @@ const Userchat: FC<any> = props => {
         };
 
         const resp = await dispatch(fetchuserchat(body));
-        if (resp?.payload?.success === true) {
-          // showSuccess('chat fetched successfully..');
-        } else {
+        if (resp?.payload?.success !== true) {
           showError('failed to fetch chat');
         }
       } catch (error) {
@@ -263,7 +248,46 @@ const Userchat: FC<any> = props => {
     };
   }, []);
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
+    if (selectedFile) {
+      console.log(selectedFile, 'selectedFilepdf');
+
+      const formData = new FormData();
+      formData.append('file', {
+        uri: selectedFile.uri,
+        type: selectedFile.type,
+        name:
+          selectedFile.name || selectedFile.fileName || `file_${Date.now()}`,
+      } as any);
+      const mimeType = selectedFile?.type || '';
+      const msgType = mimeType.startsWith('image/')
+        ? 'image'
+        : mimeType.startsWith('audio/')
+        ? 'audio'
+        : mimeType.startsWith('video/')
+        ? 'video'
+        : 'file';
+        
+      const res: any = await APiService.uploadFile(formData);
+      if (res.success) {
+        const msg = {
+          tempId: Date.now().toString(),
+          senderId: userData?._id,
+          receiverId: reciever?._id,
+          message: '',
+          messageType: msgType,
+          mediaUrl: res.url,
+          createdAt: new Date().toISOString(),
+        };
+
+        Socket.emit('sendmessage', msg);
+        setMessages(prev => [msg, ...prev]);
+        setSelectedFile(null);
+      }
+
+      return;
+    }
+
     if (!text.trim()) return;
     const msg = {
       tempId: Date.now().toString(),
@@ -272,44 +296,71 @@ const Userchat: FC<any> = props => {
       message: text,
       messageType: 'text',
       createdAt: new Date().toISOString(),
+      isSeen: isonlineuser && true,
     };
     Socket.emit('sendmessage', msg);
     setMessages(prev => [msg, ...prev]);
     setText('');
   };
 
+  useEffect(() => {
+    if (messages.length > 0) {
+      requestAnimationFrame(() => {
+        flatlistRef.current?.scrollToOffset({
+          offset: 0,
+          animated: true,
+        });
+      });
+    }
+  }, [messages.length]);
+
   const pickGallery = async () => {
     try {
       const response = await launchImageLibrary({
-        mediaType: 'mixed',
+        mediaType: 'photo',
         selectionLimit: 1,
       });
 
-      if (response.assets?.length) {
-        console.log(response.assets[0]);
-
-        // upload api call
-        // const res = await APiService.uploadfile(response.assets[0])
-
-        setShowAttachmentModal(false);
-      }
-    } catch (error) {
-      console.log(error);
+      if (response.didCancel || !response.assets?.length) return;
+      setSelectedFile(response.assets[0]);
+      setShowAttachmentModal(false);
+    } catch (e) {
+      setShowAttachmentModal(false);
+      console.log(e);
     }
+  };
+
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+      );
+
+      return granted === PermissionsAndroid.RESULTS.GRANTED;
+    }
+    return true;
   };
 
   const openCamera = async () => {
     try {
+      const hasPermission = await requestCameraPermission();
+
+      if (!hasPermission) {
+        console.log('Camera permission denied');
+        return;
+      }
+
       const response = await launchCamera({
         mediaType: 'photo',
         cameraType: 'back',
+        saveToPhotos: false,
+        quality: 0.8,
       });
 
-      if (response.assets?.length) {
-        console.log(response.assets[0]);
-
-        setShowAttachmentModal(false);
+      if (response.didCancel || !response.assets?.length) {
+        return;
       }
+      setSelectedFile(response.assets[0]);
     } catch (error) {
       console.log(error);
     }
@@ -317,34 +368,53 @@ const Userchat: FC<any> = props => {
 
   const pickDocument = async () => {
     try {
-      const [file] = await pick();
+      const [file] = await pick({
+        allowMultiSelection: false,
+        type: [types.pdf, types.doc, types.docx, types.xls, types.xlsx],
+      });
 
-      console.log(file);
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.ms-excel',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ];
 
+      if (!allowedTypes.includes(file.type ?? '')) {
+        Alert.alert(
+          'Invalid File',
+          'Please select only PDF, Word or Excel files.',
+        );
+        return;
+      }
+
+      setSelectedFile(file);
       setShowAttachmentModal(false);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error?.code !== 'DOCUMENT_PICKER_CANCELED') {
+        console.log(error);
+      }
     }
   };
 
-  // const sendAudioMessage = (filePath: string) => {
-  //   const msg = {
-  //     tempId: Date.now().toString(),
-  //     senderId: userData?._id,
-  //     receiverId: reciever?._id,
-  //     message: '',
-  //     messageType: 'audio',
-  //     mediaUrl: filePath, // ⚠️ abhi local path hai
-  //     createdAt: new Date().toISOString(),
-  //   };
+  const sendAudioMessage = (filePath: string) => {
+    const msg = {
+      tempId: Date.now().toString(),
+      senderId: userData?._id,
+      receiverId: reciever?._id,
+      message: '',
+      messageType: 'audio',
+      mediaUrl: filePath,
+      createdAt: new Date().toISOString(),
+    };
 
-  //   Socket.emit('sendmessage', msg);
-  //   setMessages(prev => [msg, ...prev]);
-  // };
+    Socket.emit('sendmessage', msg);
+    setMessages(prev => [msg, ...prev]);
+  };
 
   const renderItem = ({ item }: any) => {
     const isMe = item.senderId === userData?._id;
-    // console.log(item.mediaUrl, '===');
 
     return (
       <View
@@ -360,16 +430,12 @@ const Userchat: FC<any> = props => {
             backgroundColor: isMe ? Colors.PRIMARY[100] : '#fff',
             padding: 10,
             borderRadius: 12,
-
-            // WhatsApp style bubble shape
             borderTopRightRadius: isMe ? 0 : 12,
             borderTopLeftRadius: isMe ? 12 : 0,
-
             maxWidth: wp(80),
-            ...cardShadow, // Android shadow
+            ...cardShadow,
           }}
         >
-          {/* Message */}
           <TextView
             style={{
               color: isMe ? Colors.SECONDARY[100] : Colors.SECONDARY[200],
@@ -377,22 +443,107 @@ const Userchat: FC<any> = props => {
           >
             {item.message}
           </TextView>
-
           {item.messageType === 'audio' && <AudioPlayer url={item.mediaUrl} />}
+          {item.messageType === 'image' && (
+            <View
+              style={{
+                width: wp(60),
+                height: hp(20),
+                borderRadius: 12,
+                overflow: 'hidden',
+                marginTop: 5,
+              }}
+            >
+              <Image
+                source={{ uri: item.mediaUrl }}
+                style={{
+                  maxWidth: wp(60),
+                  width: wp(60),
+                  height: 220,
+                  borderRadius: 10,
+                }}
+                resizeMode="cover"
+              />
+            </View>
+          )}
 
-          <TextView
+          {item.messageType === 'file' && (
+            <TouchableOpacity
+              style={{
+                width: wp(60),
+                backgroundColor: '#fff',
+                borderRadius: 12,
+                padding: 12,
+                flexDirection: 'row',
+                alignItems: 'center',
+              }}
+              onPress={() => navigation.navigate('Pdfviewer', { data: item })}
+            >
+              <Icon
+                family="MaterialCommunityIcons"
+                name="file-pdf-box"
+                size={40}
+                color={Colors.ERROR[100]}
+              />
+
+              <View style={{ flex: 1, marginLeft: 10 }}>
+                <TextView numberOfLines={1} style={{ fontWeight: '600' }}>
+                  {item.fileName}
+                </TextView>
+
+                <TextView
+                  style={{
+                    color: '#777',
+                    marginTop: 2,
+                    fontSize: 12,
+                  }}
+                >
+                  {item.size
+                    ? `${(item.size / 1024).toFixed(1)} KB`
+                    : 'PDF Document'}
+                </TextView>
+              </View>
+            </TouchableOpacity>
+          )}
+          <View
             style={{
-              fontSize: 10,
-              color: isMe ? '#e0e0e0' : '#888',
+              width: wp(15),
+              flexDirection: 'row',
               alignSelf: 'flex-end',
-              marginTop: 4,
+              top: 3,
+              padding: hp(0.2),
             }}
           >
-            {new Date(item.createdAt).toLocaleTimeString([], {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </TextView>
+            <TextView
+              style={{
+                ...Typography.BodyRegular12,
+                color: isMe ? '#e0e0e0' : '#888',
+                alignSelf: 'flex-end',
+                marginTop: 4,
+                right: hp(0.4),
+              }}
+            >
+              {new Date(item.createdAt).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </TextView>
+            {item?.isSeen === false ? (
+              <Icon
+                family="Ionicons"
+                name="checkmark"
+                size={18}
+                color={isMe ? Colors.SECONDARY[100] : Colors.PRIMARY[100]}
+              />
+            ) : (
+              <Icon
+                family="Ionicons"
+                name="checkmark-done"
+                size={18}
+                color={isMe ? Colors.SECONDARY[100] : Colors.PRIMARY[100]}
+              />
+            )}
+          </View>
         </View>
       </View>
     );
@@ -417,7 +568,8 @@ const Userchat: FC<any> = props => {
       >
         <View style={{ flex: 1 }}>
           <FlatList
-            data={[...(messages.length ? messages : chatState)]}
+            // messages खाली होने पर chatState को कॉपी करके सुरक्षित रूप से रिवर्स रेंडर करें
+            data={messages.length ? messages : [...chatState].reverse()}
             keyExtractor={(item, index) =>
               item?._id?.toString() ||
               item?.tempId?.toString() ||
@@ -426,12 +578,6 @@ const Userchat: FC<any> = props => {
             renderItem={renderItem}
             inverted
             ref={flatlistRef}
-            onContentSizeChange={() =>
-              flatlistRef.current?.scrollToOffset({
-                offset: 0,
-                animated: false,
-              })
-            }
             showsVerticalScrollIndicator={false}
             maintainVisibleContentPosition={{ minIndexForVisible: 0 }}
             keyboardShouldPersistTaps="handled"
@@ -442,7 +588,6 @@ const Userchat: FC<any> = props => {
           />
         </View>
         <View style={[styles.inputbar, { paddingBottom: insets.bottom || 8 }]}>
-          {/* INPUT */}
           <TextInput
             style={styles.inputtext}
             placeholder="Type a message"
@@ -458,36 +603,10 @@ const Userchat: FC<any> = props => {
             }}
           />
 
-          {/* <TouchableOpacity
-            onPressIn={startrecording}
-            onPressOut={stoprecording}
-            // style={styles.sendBtn}
-            style={{right:hp(1)}}
-          >
-            <Icon
-              name={isRecording ? 'mic-off' : 'mic'}
-              size={22}
-              color={currentTheme.background}
-              family="Ionicons"
-            />
-          </TouchableOpacity> */}
           <View style={styles.itemwidth}>
             <Voicerecorder
               onSend={async (filePath: string) => {
-                const res: any = await APiService.uplaodaudio(filePath);
-                //  console.log('=====3res', res);
-
-                const msg = {
-                  tempId: Date.now().toString(),
-                  senderId: userData?._id,
-                  receiverId: reciever?._id,
-                  messageType: 'audio',
-                  mediaUrl: res.url,
-                  createdAt: new Date().toISOString(),
-                };
-
-                Socket.emit('sendmessage', msg);
-                setMessages(prev => [msg, ...prev]);
+                sendAudioMessage(filePath);
               }}
             />
 
@@ -504,8 +623,8 @@ const Userchat: FC<any> = props => {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setShowAttachmentModal(true)}
-              style={{ marginLeft: hp(0.7) }}
+              onPress={() => openCamera()}
+              style={{ right: hp(0.7) }}
             >
               <Icon
                 name="camera"
@@ -515,12 +634,6 @@ const Userchat: FC<any> = props => {
               />
             </TouchableOpacity>
 
-            {/* 😊 */}
-            {/* <TouchableOpacity>
-            <TextView style={{ fontSize: 18 }}>😊</TextView>
-          </TouchableOpacity> */}
-
-            {/* SEND */}
             <TouchableOpacity
               activeOpacity={0.7}
               onPress={() => sendMessage()}
@@ -538,16 +651,21 @@ const Userchat: FC<any> = props => {
             visible={showAttachmentModal}
             onClose={() => setShowAttachmentModal(false)}
             onGallery={pickGallery}
-            onCamera={openCamera}
             onDocument={pickDocument}
             onLocation={() => {
               setShowAttachmentModal(false);
-            } }
+            }}
             onContact={() => {
               setShowAttachmentModal(false);
-            } } icon={''} title={''} color={''} onPress={function (): void {
+            }}
+            icon={''}
+            title={''}
+            color={''}
+            onPress={function (): void {
               throw new Error('Function not implemented.');
-            } } family={undefined}          />
+            }}
+            family={undefined}
+          />
         </View>
       </KeyboardAvoidingView>
     </View>

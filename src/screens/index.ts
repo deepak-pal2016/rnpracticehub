@@ -13,5 +13,6 @@ import Userchat from "@screens/home/chat/userchat";
 import VideoCallScreen from "@screens/home/videocall/videocallscreen";
 import IncomingCallScreen from "@screens/home/videocall/incomingvideocall";
 import Audiocall from "@screens/home/videocall/audiocall";
+import Pdfviewer from "@screens/home/pdfviewer/pdfview";
 
-export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus,Userchat,VideoCallScreen,IncomingCallScreen,Audiocall}
+export {Login,Dashboard, Addtask,Profile,Users,Tasklist,Notification,Signup,Taskdetails,Taskstatus,Userchat,VideoCallScreen,IncomingCallScreen,Audiocall,Pdfviewer}

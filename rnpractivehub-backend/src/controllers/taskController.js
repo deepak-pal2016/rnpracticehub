@@ -152,7 +152,7 @@ const completetask = async (req, res) => {
           'Task Completed',
           `${req.user.name} completed the task ${task.title}`,
         );
-        console.log(assigner, 'caalignt his fuctnion');
+        // console.log(assigner, 'caalignt his fuctnion');
       }
     }
   } catch (err) {

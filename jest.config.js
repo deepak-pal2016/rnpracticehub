@@ -29,7 +29,7 @@ module.exports = {
   setupFiles: ['<rootDir>/jest.setup.js'],
 
   transformIgnorePatterns: [
-    'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-flash-message|react-native-vector-icons|react-native-keyboard-aware-scroll-view|react-native-responsive-screen|react-native-modal|react-native-dropdown-picker|@react-native-community/datetimepicker|@reduxjs/toolkit|immer|@react-native-firebase)/)',
+    'node_modules/(?!(react-native|@react-native|@react-navigation|react-native-flash-message|react-native-vector-icons|react-native-keyboard-aware-scroll-view|react-native-responsive-screen|react-native-modal|react-native-dropdown-picker|@react-native-community/datetimepicker|@reduxjs/toolkit|immer|@react-native-firebase|react-native-audio-record)/)',
   ],
 
   moduleNameMapper: {

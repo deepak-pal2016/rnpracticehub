@@ -107,6 +107,19 @@ io.on('connection', socket => {
     io.emit('onlineusers', Object.keys(onlineusers));
   });
 
+  socket.on('markseen', async ({ senderId, receiverId }) => {
+     console.log('MARK AS SEEN:', senderId,receiverId);
+    const result = await Chat.updateMany(
+      { senderId, receiverId, isSeen: false },
+      { $set: { isSeen: true } },
+    );
+
+    const sendersocketid = onlineusers[senderId];
+    if (sendersocketid) {
+      io.to(sendersocketid).emit('messagesseen');
+    }
+  });
+
   socket.on('sendmessage', async data => {
     try {
       const chat = await Chat.create(data);

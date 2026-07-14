@@ -28,6 +28,7 @@ export type HomeStackProps = {
   IncomingCallScreen:{
     data:any
   }
+  Pdfviewer:{data:any};
   
 
 }

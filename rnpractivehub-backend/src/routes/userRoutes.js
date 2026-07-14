@@ -15,7 +15,7 @@ const {
   deletetaskbyid,
 } = require('../controllers/taskController');
 const { sendMessage, getuserchats } = require('../controllers/chatController');
-const { uploadAudio } = require('../controllers/uploadController');
+const { uploadAudio, uploadDocs } = require('../controllers/uploadController');
 const upload = require('../middleware/upload');
 router.post('/adduser', addUser);
 router.post('/getuser', authMiddleware, getUser);
@@ -26,7 +26,7 @@ router.post('/sendmessage', authMiddleware, sendMessage);
 router.post('/getuserchats', authMiddleware, getuserchats);
 router.post('/loginuser', loginUser);
 router.post('/logoutuser', authMiddleware, logout);
-router.post('/upload', upload.single('file'), uploadAudio);
+router.post('/upload', upload.single('file'), uploadAudio); 
 router.delete('/deletetask/:taskid', authMiddleware, deletetaskbyid);
 
 module.exports = router;

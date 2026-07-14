@@ -6,6 +6,7 @@ import {
   Dashboard,
   IncomingCallScreen,
   Notification,
+  Pdfviewer,
   Taskdetails,
   Tasklist,
   Taskstatus,
@@ -102,6 +103,12 @@ const Homestacknavigator: FC = () => {
             ...Typography.BodyRegular13,
           },
         }}
+      />
+
+       <HomeStack.Screen
+        name="Pdfviewer"
+        component={Pdfviewer}
+       
       />
     </HomeStack.Navigator>
   );

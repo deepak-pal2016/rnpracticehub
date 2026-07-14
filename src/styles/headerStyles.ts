@@ -42,7 +42,7 @@ const styles =(theme:any) => StyleSheet.create({
 
   screenname: {
     color: theme?.text,
-    ...Typography.H4SemiBold20,
+    ...Typography.H5Medium18,
     padding:hp(1)
   },
 

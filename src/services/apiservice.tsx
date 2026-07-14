@@ -81,27 +81,18 @@ const APiService = {
     return APIKit.post('logoutuser', {}, { headers });
   },
 
-  uplaodaudio: async (filePath: string) => {
+  uploadFile: async (formData: FormData) => {
     try {
       const token = await LocalStorage.read('@token');
-      const formdata = new FormData();
-
-      formdata.append('file', {
-        uri: 'file://' + filePath,
-        type: 'audio/wav',
-        name: 'voice.wav',
-      } as any);
-
-      const res = await APIKit.post('upload', formdata, {
+      const resp:any = await APIKit.post('upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
       });
-
-      return res.data;
+      return resp?.data
     } catch (error) {
-      console.log('upload error', error);
+      console.log('Upload Error:', error);
       throw error;
     }
   },

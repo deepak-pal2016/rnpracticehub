@@ -73,7 +73,7 @@ const Addtask: FC = () => {
     (state: any) => state?.staticdata?.priorityOptions,
   );
 
-  const formatDate = (dateStr) => {
+  const formatDate = (dateStr:any) => {
   if (!dateStr) return null;
 
   const [day, month, year] = dateStr.split('/');
@@ -103,7 +103,7 @@ const Addtask: FC = () => {
             assignedBy: userData?._id,
           };
           const response: any = await dispatch(AddTask(params)).unwrap();
-          // console.log(response,'response=111deepak');
+          //  console.log(response,'response=111deepak');
           
           if(response?.status === true){
             showSuccess('Task assign to user successfully..')
@@ -136,9 +136,8 @@ const Addtask: FC = () => {
       <Header
         title="Add Task"
         screenname="Add Task"
-        showicons={true}
-        showheader={false}
-      />
+        showicons={false}
+        showheader={false} receiverid={undefined}      />
       <TouchableWithoutFeedback>
         <KeyboardAwareScrollView
           contentContainerStyle={{
@@ -281,8 +280,8 @@ const Addtask: FC = () => {
               title={'Add Task'}
               gradientColors={[
                 Colors.PRIMARY[100],
-                Colors.PRIMARY[200],
-                Colors.PRIMARY[300],
+                Colors.PRIMARY[100],
+                // Colors.PRIMARY[300],
               ]}
             />
           </View>

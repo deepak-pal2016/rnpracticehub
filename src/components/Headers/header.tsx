@@ -50,8 +50,6 @@ const Header: React.FC<headerProps> = ({
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = createStyles(currentTheme);
 
- 
-
   return (
     <View
       style={[

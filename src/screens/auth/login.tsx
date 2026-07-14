@@ -54,7 +54,7 @@ type LoginscreenNavigationType = NativeStackNavigationProp<
 const Login: FC = () => {
   // const [login, { data, error, isLoading }] = useLoginMutation();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
+  const navigation = useNavigation<LoginscreenNavigationType>();
   const dispatch = useAppDispatch();
   const { setIsLoggedIn, setUserData } = useContext<UserData>(UserDataContext);
   const { showLoader, hideLoader } = CommonLoader();

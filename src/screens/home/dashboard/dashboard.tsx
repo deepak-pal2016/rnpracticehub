@@ -8,10 +8,19 @@ import {
   FlatList,
   Pressable,
   TouchableOpacity,
+  RefreshControl,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
-import React, { FC, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
 import { useNavigation } from '@react-navigation/native';
@@ -48,15 +57,16 @@ type DashboardscreenNavigationType = NativeStackNavigationProp<
 >;
 
 const Dashboard: FC = () => {
+  const EMPTY_TASKS: any[] = [];
+  const [refreshing, setRefreshing] = useState(false);
   const dispatch = useDispatch<any>();
   const { showLoader, hideLoader } = CommonLoader();
   const navigation = useNavigation<DashboardscreenNavigationType>();
   const { theme, themetoggle } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = dashboardstyle(currentTheme);
-  const alltasklist = useSelector(
-    (state: any) => state?.getalltask?.data?.data,
-  );
+  const alltasklist =
+    useSelector((state: any) => state?.getalltask?.data?.data) ?? EMPTY_TASKS;
 
   const pagesize = alltasklist?.length > 10 ? 5 : 3;
   const { data, loading, hasMore, loadMore } = UsePagination(
@@ -79,13 +89,13 @@ const Dashboard: FC = () => {
   }, [alltasklist]);
 
   useEffect(() => {
-    fetchuserliset();
+    fetchuserlist();
   }, [userData?.email]);
 
   useEffect(() => {
     setTaskList([
       {
-        taskname: 'Total Tasks',
+        taskname: 'Total Task',
         taskcount: alltasklist?.length || 0,
         color: Colors.PRIMARY[600],
       },
@@ -102,7 +112,18 @@ const Dashboard: FC = () => {
     ]);
   }, [alltasklist]);
 
-  const fetchuserliset = async () => {
+  const onrefresh = useCallback(async () => {
+    showLoader();
+    try {
+      await fetchuserlist();
+    } catch (error) {
+      console.log('error in refresh', error);
+    } finally {
+      hideLoader();
+    }
+  }, []);
+
+  const fetchuserlist = async () => {
     try {
       showLoader();
       const resp: any = await dispatch(Getallusertask(userData?._id));
@@ -324,7 +345,9 @@ const Dashboard: FC = () => {
         showicons={false}
         screenname="Dashboard"
         showheader={false}
+        receiverid={undefined}
       />
+
       <View style={styles.contentStyle}>
         <View
           style={{
@@ -435,6 +458,8 @@ const Dashboard: FC = () => {
             removeClippedSubviews={true}
             onEndReached={loadMore}
             windowSize={5}
+            refreshing={refreshing}
+            onRefresh={onrefresh}
             maxToRenderPerBatch={2}
             initialNumToRender={2}
             ListFooterComponent={

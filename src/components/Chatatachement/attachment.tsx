@@ -43,19 +43,19 @@ const Attachment: FC<AttachmentProos> = ({
         <Text style={styles.title}>Share Attachment</Text>
 
         <View style={styles.row}>
-          <AttachmentItem
+          {/* <AttachmentItem
             icon="camera"
             family={'MaterialCommunityIcons'}
             title="Camera"
-            color="#ff6b6b"
+            color={Colors.PRIMARY[100]}
             onPress={onCamera}
-          />
+          /> */}
 
           <AttachmentItem
             icon="image"
             family={'MaterialCommunityIcons'}
             title="Gallery"
-            color="#4caf50"
+            color={Colors.PRIMARY[500]}
             onPress={onGallery}
           />
 
@@ -63,7 +63,7 @@ const Attachment: FC<AttachmentProos> = ({
             icon="file-document"
             title="Document"
             family={'MaterialCommunityIcons'}
-            color="#2196f3"
+            color={Colors.PRIMARY[600]}
             onPress={onDocument}
           />
         </View>
@@ -73,15 +73,15 @@ const Attachment: FC<AttachmentProos> = ({
             icon="map-marker"
             title="Location"
             family={'MaterialCommunityIcons'}
-            color="#ff9800"
+            color={Colors.PRIMARY[200]}
             onPress={onLocation}
           />
 
           <AttachmentItem
-             icon="account"
+            icon="account"
             title="Contact"
             family={'MaterialCommunityIcons'}
-            color="#9c27b0"
+            color={Colors.PRIMARY[500]}
             onPress={onContact}
           />
         </View>
@@ -104,7 +104,7 @@ const AttachmentItem: FC<AttachmentProos> = ({
           name={icon}
           family={family}
           size={28}
-          color={Colors.SECONDARY[200]}
+          color={Colors.SECONDARY[100]}
         />
       </View>
 

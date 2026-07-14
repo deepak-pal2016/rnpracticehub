@@ -1,4 +1,6 @@
 /* eslint-disable no-unused-vars */
+
+const path = require("path");
 const uploadAudio = (req, res) => {
   try {
     if (!req.file) {
@@ -7,10 +9,16 @@ const uploadAudio = (req, res) => {
 
     console.log('FILE:', req.file);
 
-   const fileUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-    res.json({
+    const folderName = path.basename(req.file.destination);
+    const fileUrl = `${req.protocol}://${req.get(
+      'host',
+    )}/uploads/${folderName}/${req.file.filename}`;
+    res.status(200).json({
       success: true,
       url: fileUrl,
+      fileName: req.file.originalname,
+      fileType: req.file.mimetype,
+      size: req.file.size,
     });
   } catch (err) {
     console.log('UPLOAD ERROR:', err);

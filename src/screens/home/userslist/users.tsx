@@ -85,7 +85,7 @@ const avatarBaseStyle = {
 
 
   const renderItem = ({ item }: any) => {
-    const isOnline = onlineusers.includes(String(item._id)); // ✅
+    const isOnline = onlineusers.includes(String(item._id)); 
     return (
       <TouchableOpacity onPress={()=> navigation.navigate('Userchat', {'reciever':item})} style={styles.card}>
         <View
@@ -112,7 +112,7 @@ const avatarBaseStyle = {
 
   return (
     <View style={styles.container}>
-      <Header showicons={false} screenname="Friends List" showheader={false} />
+      <Header showicons={false} screenname="Chat Contacts" showheader={false} receiverid={undefined} />
       <FlatList
         data={userlistArr}
         keyExtractor={item => item._id}
