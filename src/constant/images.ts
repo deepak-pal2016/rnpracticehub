@@ -7,7 +7,7 @@ const Images = {
   ic_lock: require('@assets/icons/lock.png'),
   ic_eyeopen: require('@assets/icons/eye.png'),
   ic_eyeclose: require('@assets/icons/close-eye.png'),
-  ic_loader: require('@assets/Animation/rpcauloader.json'),
+  ic_loader: require('@assets/Animation/taskmangerloader.json'),
   ic_hi: require('@assets/icons/wave.png'),
   ic_userimg: require('@assets/images/profile.png'),
   ic_google: require('@assets/icons/google.png'),

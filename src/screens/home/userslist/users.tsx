@@ -111,7 +111,8 @@ const avatarBaseStyle = {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{ backgroundColor:
+            theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800],}]}>
       <Header showicons={false} screenname="Chat Contacts" showheader={false} receiverid={undefined} />
       <FlatList
         data={userlistArr}

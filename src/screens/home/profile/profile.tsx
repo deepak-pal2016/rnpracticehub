@@ -52,7 +52,6 @@ type ProfilescreenNavigationType = NativeStackNavigationProp<
 const Profile: FC = () => {
   const dispatch = useDispatch();
   const insets = useSafeAreaInsets();
-  const [darkmode, setDarkmode] = useState(false);
   const { theme, themetoggle } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = createstyles(currentTheme);
@@ -67,16 +66,6 @@ const Profile: FC = () => {
   //   let user = await LocalStorage.read('@user');
   //   console.log(val, user,'user===');
   // }
-
-  const changecolor = () => {
-    if (darkmode === true) {
-      setDarkmode(false);
-      themetoggle();
-    } else {
-      setDarkmode(true);
-      themetoggle();
-    }
-  };
 
   // rtk query logout
   //   const handleLogout = async () => {
@@ -111,7 +100,7 @@ const Profile: FC = () => {
         },
       ]}
     >
-      <Header showheader={true} title="Profile" showicons={false} />
+      <Header showheader={true} title="Profile" showicons={false} receiverid={undefined} />
       <View style={{ marginTop: hp(0) }}>
         <View style={styles.conentview}>
           <View>
@@ -185,7 +174,7 @@ const Profile: FC = () => {
                 Dark Mode
               </TextView>
             </View>
-            <Switch onChange={() => changecolor()} value={darkmode} />
+            <Switch onChange={() => themetoggle()}  value={theme === 'dark'} />
           </View>
         </View>
 

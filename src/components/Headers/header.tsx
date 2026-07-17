@@ -54,7 +54,8 @@ const Header: React.FC<headerProps> = ({
     <View
       style={[
         styles.container,
-        { flex: flexview, backgroundColor: Colors.PRIMARY[700] },
+        { flex: flexview, backgroundColor:
+                    theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800] },
       ]}
     >
       {showicons && (
@@ -118,7 +119,7 @@ const Header: React.FC<headerProps> = ({
             style={[
               styles.headerTitle,
               //@ts-ignore
-              title?.length > 33 && Typography.BodyRegular12,
+              title?.length > 33 && Typography.BodyRegular16,
             ]}
           >
             {title}

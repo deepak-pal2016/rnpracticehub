@@ -47,7 +47,8 @@ export const LocalStorage = {
           key != 'user' &&
           key != 'pass' &&
           key != 'rememberMe' &&
-          key != 'ISFINGER'
+          key != 'ISFINGER'&&
+          key != '@theme'
         ) {
           this.removeItem(key);
         }

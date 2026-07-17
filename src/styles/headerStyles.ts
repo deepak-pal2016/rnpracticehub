@@ -57,7 +57,7 @@ const styles =(theme:any) => StyleSheet.create({
 
   headerTitle: {
     color: theme?.text,
-    ...Typography.BodyRegular12,
+    ...Typography.ButtonText16,
     textAlign:'justify',
     padding:hp(2)
   },

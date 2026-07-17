@@ -45,13 +45,13 @@ export const CommonLoaderProvider: React.FC<ProviderProps> = ({children}) => {
         animationOut="fadeOut"
         backdropOpacity={0.3}>
         <View style={styles.loaderView}>
-          <ActivityIndicator size={'large'} color={Colors.PRIMARY[100]}  />
-          {/* <LottieView
+          {/* <ActivityIndicator size={'large'} color={Colors.PRIMARY[100]}  /> */}
+          <LottieView
             source={Images.ic_loader} 
             autoPlay
             loop
             style={{width: wp(45), height: hp(20)}}
-          /> */}
+          />
         </View>
       </Modal>
     </ModalContext.Provider>
