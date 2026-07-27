@@ -7,6 +7,7 @@ const {
   getUser,
   loginUser,
   logout,
+  uploadimage
 } = require('../controllers/userController');
 const {
   addTask,
@@ -27,6 +28,7 @@ router.post('/getuserchats', authMiddleware, getuserchats);
 router.post('/loginuser', loginUser);
 router.post('/logoutuser', authMiddleware, logout);
 router.post('/upload', upload.single('file'), uploadAudio); 
+router.post('/uploaduserimg',upload.single('image'),uploadimage)
 router.delete('/deletetask/:taskid', authMiddleware, deletetaskbyid);
 
 module.exports = router;

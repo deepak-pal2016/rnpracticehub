@@ -17,15 +17,17 @@ const styles = (theme: any) =>
       justifyContent: 'space-evenly',
       alignItems: 'center',
       paddingHorizontal: hp(4),
+      bottom:hp(3)
     },
     imgview: {
-      width: wp(28),
-      height: hp(28),
-      borderRadius: hp(14),
-      resizeMode: 'contain',
+      
+      width: wp(30),
+      height: wp(30),
+      borderRadius: wp(15),
+      resizeMode: 'cover',
     },
     nametext: {
-      textAlign:'center',
+      textAlign: 'center',
       color: theme?.text,
       ...Typography.BodyRegular16,
     },
@@ -53,10 +55,10 @@ const styles = (theme: any) =>
       paddingHorizontal: wp(5),
     },
     emailtext: {
-      color:theme?.text,
+      color: theme?.text,
       ...Typography.BodyRegular13,
       textAlign: 'center',
-      padding:hp(1)
+      padding: hp(1),
     },
   });
 

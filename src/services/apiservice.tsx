@@ -100,6 +100,15 @@ const APiService = {
     const headers = await headersdata(true);
     return APIKit.delete(`deletetask/${taskId}`, { headers });
   },
+ uploaduserimg: async (formData: FormData) => {
+  const token = await LocalStorage.read('@token');
+  return APIKit.post('uploaduserimg', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+},
 };
 
 export default APiService;

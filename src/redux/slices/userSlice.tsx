@@ -8,6 +8,19 @@ interface Userprops {
   _id: string;
 }
 
+export const Uploaduserimage = createAsyncThunk<Userprops,any,{ rejectValue: { status: number; message: string } }>
+('uploadimageuser', async (body, { rejectWithValue }) => {
+ try {
+    const response = await APiService.uploaduserimg(body)
+    return response?.data
+  } catch (error: any) {
+    return rejectWithValue({
+      status: error.response?.status || 500,
+      message: error.response?.data?.message || 'An error occurred',
+    });
+  }
+})
+
 export const Getuserlist = createAsyncThunk<
   Userprops[],
   any,

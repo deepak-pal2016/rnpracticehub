@@ -43,13 +43,13 @@ const Attachment: FC<AttachmentProos> = ({
         <Text style={styles.title}>Share Attachment</Text>
 
         <View style={styles.row}>
-          {/* <AttachmentItem
+          <AttachmentItem
             icon="camera"
             family={'MaterialCommunityIcons'}
             title="Camera"
             color={Colors.PRIMARY[100]}
             onPress={onCamera}
-          /> */}
+          />
 
           <AttachmentItem
             icon="image"
@@ -59,31 +59,32 @@ const Attachment: FC<AttachmentProos> = ({
             onPress={onGallery}
           />
 
-          <AttachmentItem
+        {onDocument && <AttachmentItem
             icon="file-document"
             title="Document"
             family={'MaterialCommunityIcons'}
             color={Colors.PRIMARY[600]}
             onPress={onDocument}
-          />
+          />}  
         </View>
 
         <View style={styles.row}>
-          <AttachmentItem
+          {onLocation && <AttachmentItem
             icon="map-marker"
             title="Location"
             family={'MaterialCommunityIcons'}
             color={Colors.PRIMARY[200]}
             onPress={onLocation}
-          />
-
-          <AttachmentItem
+          />}
+          
+            {onContact &&  <AttachmentItem
             icon="account"
             title="Contact"
             family={'MaterialCommunityIcons'}
             color={Colors.PRIMARY[500]}
             onPress={onContact}
-          />
+          />}
+         
         </View>
       </View>
     </Modal>

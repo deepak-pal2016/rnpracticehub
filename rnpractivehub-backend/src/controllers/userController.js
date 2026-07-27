@@ -179,4 +179,56 @@ const logout = async (req, res) => {
     });
   }
 };
-module.exports = { addUser, getUser, loginUser, logout };
+
+const uploadimage = async (req, res) => {
+  try { 
+    const { userId } = req.body;
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image selected.."
+      });
+    }
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User id is required.."
+      });
+    }
+
+
+    const imageUrl = `${req.protocol}://${req.get('host')}/uploads/images/${req.file.filename}`;
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        profileImage: imageUrl
+      },
+      {
+        new: true
+      }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.."
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile image uploaded successfully",
+      url: imageUrl,
+      fileName: req.file.filename,
+      type: "image",
+      user
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};
+module.exports = { addUser, getUser, loginUser, logout,uploadimage };
