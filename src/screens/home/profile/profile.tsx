@@ -71,7 +71,6 @@ const Profile: FC = () => {
   const { setIsLoggedIn, setUserData, userData } =
     useContext<UserData>(UserDataContext);
   const [showAttachmentModal, setShowAttachmentModal] = useState(false);
-  console.log(userData, 'userData=2=2');
 
   // useEffect(() => {
   //  getvalue()
@@ -123,10 +122,37 @@ const Profile: FC = () => {
 
       if (response.didCancel || !response.assets?.length) return;
       setSelectedFile(response.assets[0]);
+      console.log(response.assets[0],'response.assets[0]');
+       if (response) {
+        showLoader();
+        const formdata = new FormData();
+        formdata.append('userId', userData?._id);
+        formdata.append('image', {
+          uri: response.assets[0].uri,
+          type: response.assets[0].type || 'image/jpeg',
+          name: response.assets[0].fileName || 'profile-image.jpg',
+        } as any);
+        const resp: any = await dispatch(Uploaduserimage(formdata)).unwrap();
+        if (resp?.success === true) {
+          showSuccess('Profile image updated successfully..');
+          await LocalStorage.save('@user', resp?.user);
+          setUserData(resp?.user);
+        } else {
+          showError('Profile image not updated..');
+        }
+      } else {
+        showError('Please open camera take selfie..');
+      }
       setShowAttachmentModal(false);
-    } catch (e) {
+    } catch (error:any) {
       setShowAttachmentModal(false);
-      console.log(e);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An error occurred while adding the task';
+      showError(errorMessage);
+    }finally{
+      hideLoader()
     }
   };
 
@@ -204,7 +230,7 @@ const Profile: FC = () => {
           <View style={{ flexDirection: 'column',  }}>
             <Image
               source={
-                userData ? { uri: userData?.profileImage } : Images?.ic_userimg
+                userData?.profileImage ? { uri: userData?.profileImage } : Images?.ic_userimg
               }
               style={styles.imgview}
             />
@@ -212,21 +238,21 @@ const Profile: FC = () => {
           <Pressable
             onPress={() => setShowAttachmentModal(true)}
             style={{
-              width: wp(8),
-              height: hp(4),
+              width: wp(7),
+              height: hp(3.5),
               borderRadius: hp(2),
               justifyContent: 'center',
               alignItems: 'center',
               backgroundColor: Colors.PRIMARY[100],
               position: 'absolute',
-              left: hp(18),
+              left: hp(16),
               bottom: hp(0),
             }}
           >
             <Icon
               family="Ionicons"
               name="camera"
-              size={20}
+              size={18}
               color={currentTheme?.text}
             />
           </Pressable>
@@ -340,9 +366,14 @@ const Profile: FC = () => {
         color={''}
         onPress={function (): void {
           throw new Error('Function not implemented.');
-        }}
-        family={undefined}
-      />
+        } }
+        family={undefined} onDocument={function (): void {
+          throw new Error('Function not implemented.');
+        } } onLocation={function (): void {
+          throw new Error('Function not implemented.');
+        } } onContact={function (): void {
+          throw new Error('Function not implemented.');
+        } }      />
     </View>
   );
 };

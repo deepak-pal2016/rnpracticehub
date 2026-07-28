@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable react/self-closing-comp */
 /* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -16,6 +17,7 @@ import { ThemeContext } from '../context/themeContext';
 import { DarkTheme, LightTheme, TextView } from '@components/index';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { HomeStackProps } from 'src/@types';
+import { View } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 type BottomTabNavigatorscreenNavigationType = NativeStackNavigationProp<
@@ -26,6 +28,34 @@ type BottomTabNavigatorscreenNavigationType = NativeStackNavigationProp<
 const BottomTabNavigator: FC = () => {
   const { theme } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
+
+  const TabIcon = ({
+    focused,
+    children,
+  }: {
+    focused: boolean;
+    children: React.ReactNode;
+  }) => {
+    return (
+      <View style={{ alignItems: 'center' }}>
+        {focused && (
+          <View
+            style={{
+              position: 'absolute',
+              top: hp(-1),
+              width: wp(10),
+              height: hp(0.3),
+              borderRadius: hp(1),
+              borderBottomLeftRadius:hp(3),
+              borderBottomRightRadius:hp(3),
+              backgroundColor: Colors.PRIMARY[100],
+            }}
+          />
+        )}
+        {children}
+      </View>
+    );
+  };
   return (
     <Tab.Navigator
       screenOptions={{
@@ -53,20 +83,26 @@ const BottomTabNavigator: FC = () => {
             return (
               <TextView
                 style={{
-                  color: focused ?
-                    currentTheme?.text : Colors.FLOATINGINPUT[100],
+                  color: focused
+                    ? currentTheme?.text
+                    : Colors.FLOATINGINPUT[100],
                   ...Typography.BodyRegular12,
                 }}
-              >Task</TextView>
+              >
+                Task
+              </TextView>
             );
           },
+
           tabBarIcon: ({ color, size, focused }) => (
-            <Icon
-              family="Ionicons"
-              name="time-outline"
-              size={24}
-              color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
-            />
+            <TabIcon focused={focused}>
+              <Icon
+                family="Ionicons"
+                name="time-outline"
+                size={24}
+                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+              />
+            </TabIcon>
           ),
         }}
       />
@@ -75,24 +111,30 @@ const BottomTabNavigator: FC = () => {
         name="Chat"
         component={Users}
         options={{
-           tabBarLabel: ({ focused }) => {
+          tabBarLabel: ({ focused }) => {
             return (
               <TextView
                 style={{
-                  color: focused ?
-                    currentTheme?.text : Colors.FLOATINGINPUT[100],
+                  color: focused
+                    ? currentTheme?.text
+                    : Colors.FLOATINGINPUT[100],
                   ...Typography.BodyRegular12,
                 }}
-              >Chat</TextView>
+              >
+                Chat
+              </TextView>
             );
           },
+
           tabBarIcon: ({ color, size, focused }) => (
-            <Icon
-              family="Ionicons"
-              name="chatbubble-outline"
-              size={24}
-              color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
-            />
+            <TabIcon focused={focused}>
+              <Icon
+                family="Ionicons"
+                name="chatbubble-outline"
+                size={24}
+                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+              />
+            </TabIcon>
           ),
         }}
       />
@@ -101,24 +143,30 @@ const BottomTabNavigator: FC = () => {
         name="Add Task"
         component={Addtask}
         options={{
-           tabBarLabel: ({ focused }) => {
+          tabBarLabel: ({ focused }) => {
             return (
               <TextView
                 style={{
-                   color: focused ?
-                    currentTheme?.text : Colors.FLOATINGINPUT[100],
+                  color: focused
+                    ? currentTheme?.text
+                    : Colors.FLOATINGINPUT[100],
                   ...Typography.BodyRegular12,
                 }}
-              >Add Task</TextView>
+              >
+                Add Task
+              </TextView>
             );
           },
+
           tabBarIcon: ({ color, size, focused }) => (
-            <Icon
-              family="FontAwesome"
-              name="tasks"
-              size={24}
-              color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
-            />
+            <TabIcon focused={focused}>
+              <Icon
+                family="FontAwesome"
+                name="tasks"
+                size={24}
+                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+              />
+            </TabIcon>
           ),
         }}
       />
@@ -127,24 +175,30 @@ const BottomTabNavigator: FC = () => {
         name="Profile"
         component={Profile}
         options={{
-           tabBarLabel: ({ focused }) => {
+          tabBarLabel: ({ focused }) => {
             return (
               <TextView
                 style={{
-                  color: focused ?
-                    currentTheme?.text : Colors.FLOATINGINPUT[100],
+                  color: focused
+                    ? currentTheme?.text
+                    : Colors.FLOATINGINPUT[100],
                   ...Typography.BodyRegular12,
                 }}
-              >Profile</TextView>
+              >
+                Profile
+              </TextView>
             );
           },
+
           tabBarIcon: ({ color, size, focused }) => (
-            <Icon
-              family="Ionicons"
-              name="person-outline"
-              size={24}
-              color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
-            />
+            <TabIcon focused={focused}>
+              <Icon
+                family="Ionicons"
+                name="person-outline"
+                size={24}
+                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+              />
+            </TabIcon>
           ),
         }}
       />

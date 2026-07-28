@@ -1,3 +1,5 @@
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react/no-unstable-nested-components */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import React, { FC, useContext, useEffect, useState } from 'react';
@@ -30,16 +32,14 @@ type UsersscreenNavigationType = NativeStackNavigationProp<
 >;
 
 const Users: FC = () => {
-    const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   const { theme } = useContext(ThemeContext);
-  const navigation = useNavigation<UsersscreenNavigationType>()
+  const navigation = useNavigation<UsersscreenNavigationType>();
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = usersStyles(currentTheme);
   const { userData, setIsLoggedIn } = useContext<UserData>(UserDataContext);
-  const onlineusers = useSelector(
-  (state: any) => state?.onlineuser?.users
-);
-  
+  const onlineusers = useSelector((state: any) => state?.onlineuser?.users);
+
   const userState = useSelector(
     (state: any) => state?.userlist?.userlist?.data,
   );
@@ -56,45 +56,44 @@ const Users: FC = () => {
   };
 
   const colors = [
-  '#FF5733',
-  '#33B5FF',
-  '#9C27B0',
-  '#4CAF50',
-  '#FF9800',
-  '#E91E63',
-];
+    '#FF5733',
+    '#33B5FF',
+    '#9C27B0',
+    '#4CAF50',
+    '#FF9800',
+    '#E91E63',
+  ];
 
-const getColor = (name: string) => {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % colors.length;
-  return colors[index];
-};
+  const getColor = (name: string) => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const index = Math.abs(hash) % colors.length;
+    return colors[index];
+  };
 
-const avatarBaseStyle = {
-  width: 50,
-  height: 50,
-  borderRadius: 25,
-  justifyContent: 'center' as const,
-  alignItems: 'center' as const,
-};
-
-
-
+  const avatarBaseStyle = {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+  };
 
   const renderItem = ({ item }: any) => {
-    const isOnline = onlineusers.includes(String(item._id)); 
+    const isOnline = onlineusers.includes(String(item._id));
     return (
-      <TouchableOpacity onPress={()=> navigation.navigate('Userchat', {'reciever':item})} style={styles.card}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate('Userchat', { reciever: item })}
+        style={styles.card}>
         <View
-          style={[
-            avatarBaseStyle,
-            { backgroundColor: getColor(item.name) },
-          ]}
-        >
-          <TextView style={{color:Colors.SECONDARY[100],...Typography.BodyRegular13}}>
+          style={[avatarBaseStyle, { backgroundColor: getColor(item.name) }]}>
+          <TextView
+            style={{
+              color: Colors.SECONDARY[100],
+              ...Typography.BodyRegular13,
+            }}>
             {getInitials(item.name)}
           </TextView>
         </View>
@@ -111,13 +110,30 @@ const avatarBaseStyle = {
   };
 
   return (
-    <View style={[styles.container,{ backgroundColor:
-            theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800],}]}>
-      <Header showicons={false} screenname="Chat Contacts" showheader={false} receiverid={undefined} />
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor:
+            theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800],
+        },
+      ]}
+    >
+      <Header
+        showicons={false}
+        screenname="Chat Contacts"
+        showheader={false}
+        receiverid={undefined}
+      />
       <FlatList
         data={userlistArr}
         keyExtractor={item => item._id}
         renderItem={renderItem}
+        ListEmptyComponent={() => (
+          <View style={{flex:1, justifyContent:'center',alignItems:'center'}}>
+            <TextView style={{color:Colors.SECONDARY[200], ...Typography.BodyRegular13, top:40}}>User list not found..</TextView>
+          </View>
+        )}
       />
     </View>
   );

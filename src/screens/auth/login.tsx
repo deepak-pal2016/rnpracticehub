@@ -104,7 +104,6 @@ const Login: FC = () => {
               Socket.connect();
               Socket.emit('user_online', response?.data?._id);
             }
-            console.log(response?.data?._id, '===2');
             showSuccess('Login Successfully');
           } else {
             showError(response?.message || 'Login failed');
