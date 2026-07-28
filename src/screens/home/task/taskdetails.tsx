@@ -51,12 +51,14 @@ type TaskdetailsscreenNavigationType = NativeStackNavigationProp<
 
 const Taskdetails: FC = ({ route }: any) => {
   const { showLoader, hideLoader } = CommonLoader();
-  const navigation = useNavigation<TaskdetailsscreenNavigationType>();
+  const navigation = useNavigation<any>();
   const dispatch = useDispatch<any>();
   const { theme, themetoggle } = useContext(ThemeContext);
   const currentTheme = theme === 'light' ? LightTheme : DarkTheme;
   const styles = addtaskStyles(currentTheme);
+  const {  userData } = useContext<UserData>(UserDataContext);
   const task: any = route.params?.detailstask;
+  console.log(task, '=3=3=3',userData);
 
   return (
     <ScrollView style={styles.containertaskdtails}>
@@ -188,8 +190,8 @@ const Taskdetails: FC = ({ route }: any) => {
             </View>
           </View>
         )}
-
-        {task?.isCompleted !== true && (
+      
+        {userData?._id != task?.assignedBy?._id && task?.isCompleted !== true && (
           <Button
             gradientColors={[
               Colors.PRIMARY[100],

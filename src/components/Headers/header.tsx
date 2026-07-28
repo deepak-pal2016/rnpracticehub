@@ -55,7 +55,7 @@ const Header: React.FC<headerProps> = ({
       style={[
         styles.container,
         { flex: flexview, backgroundColor:
-                    theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800] },
+                    theme === 'dark' ? currentTheme?.background : Colors.SECONDARY[100] },
       ]}
     >
       {showicons && (

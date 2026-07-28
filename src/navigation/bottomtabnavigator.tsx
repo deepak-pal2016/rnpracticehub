@@ -68,9 +68,9 @@ const BottomTabNavigator: FC = () => {
           borderTopEndRadius: hp(0),
           borderTopStartRadius: hp(0),
           borderColor:
-            theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800],
+            theme === 'dark' ? currentTheme?.background : Colors.SECONDARY[100],
           backgroundColor:
-            theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800],
+            theme === 'dark' ? currentTheme?.background : Colors.SECONDARY[100],
           ...cardShadow,
         },
       }}
@@ -99,8 +99,8 @@ const BottomTabNavigator: FC = () => {
               <Icon
                 family="Ionicons"
                 name="time-outline"
-                size={24}
-                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+                size={22}
+                color={focused ? currentTheme?.text : Colors.SECONDARY[200]}
               />
             </TabIcon>
           ),
@@ -131,8 +131,8 @@ const BottomTabNavigator: FC = () => {
               <Icon
                 family="Ionicons"
                 name="chatbubble-outline"
-                size={24}
-                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+                size={22}
+                color={focused ? currentTheme?.text : Colors.SECONDARY[200]}
               />
             </TabIcon>
           ),
@@ -163,8 +163,8 @@ const BottomTabNavigator: FC = () => {
               <Icon
                 family="FontAwesome"
                 name="tasks"
-                size={24}
-                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+                size={22}
+                color={focused ? currentTheme?.text : Colors.SECONDARY[200]}
               />
             </TabIcon>
           ),
@@ -195,8 +195,8 @@ const BottomTabNavigator: FC = () => {
               <Icon
                 family="Ionicons"
                 name="person-outline"
-                size={24}
-                color={focused ? currentTheme?.text : Colors.FLOATINGINPUT[100]}
+                size={22}
+                color={focused ? currentTheme?.text : Colors.SECONDARY[200]}
               />
             </TabIcon>
           ),

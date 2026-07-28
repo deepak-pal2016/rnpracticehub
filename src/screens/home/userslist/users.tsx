@@ -82,23 +82,38 @@ const Users: FC = () => {
   };
 
   const renderItem = ({ item }: any) => {
-    const isOnline = onlineusers.includes(String(item._id));
     return (
       <TouchableOpacity
         onPress={() => navigation.navigate('Userchat', { reciever: item })}
-        style={styles.card}>
-        <View
-          style={[avatarBaseStyle, { backgroundColor: getColor(item.name) }]}>
-          <TextView
-            style={{
-              color: Colors.SECONDARY[100],
-              ...Typography.BodyRegular13,
-            }}>
-            {getInitials(item.name)}
-          </TextView>
-        </View>
+        style={styles.card}
+      >
+        {item?.profileImage ? (
+          <View style={styles.userimglist}>
+            <Image
+              source={{ uri: item?.profileImage }}
+              style={styles.avatarimg}
+            />
+          </View>
+        ) : (
+          <View
+            style={[avatarBaseStyle, { backgroundColor: getColor(item.name) }]}
+          >
+            {' '}
+            <TextView
+              style={{
+                color: Colors.SECONDARY[100],
+                ...Typography.BodyRegular13,
+              }}
+            >
+              {getInitials(item.name)}
+            </TextView>
+          </View>
+        )}
+
         <View style={styles.textContainer}>
-          <TextView style={styles.name}>{item.name}</TextView>
+          <TextView style={styles.name}>
+            {item?.name?.charAt(0).toUpperCase() + item?.name?.slice(1)}
+          </TextView>
           {/* <TextView style={styles.message}>{item.message}</TextView> */}
         </View>
         <View style={styles.rightSection}>
@@ -115,7 +130,7 @@ const Users: FC = () => {
         styles.container,
         {
           backgroundColor:
-            theme === 'dark' ? currentTheme?.background : Colors.PRIMARY[800],
+            theme === 'dark' ? currentTheme?.background : Colors.SECONDARY[100],
         },
       ]}
     >
@@ -130,8 +145,18 @@ const Users: FC = () => {
         keyExtractor={item => item._id}
         renderItem={renderItem}
         ListEmptyComponent={() => (
-          <View style={{flex:1, justifyContent:'center',alignItems:'center'}}>
-            <TextView style={{color:Colors.SECONDARY[200], ...Typography.BodyRegular13, top:40}}>User list not found..</TextView>
+          <View
+            style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+          >
+            <TextView
+              style={{
+                color: Colors.SECONDARY[200],
+                ...Typography.BodyRegular13,
+                top: 40,
+              }}
+            >
+              User list not found..
+            </TextView>
           </View>
         )}
       />

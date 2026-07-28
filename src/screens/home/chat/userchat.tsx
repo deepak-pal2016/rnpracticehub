@@ -249,9 +249,8 @@ const Userchat: FC<any> = props => {
   }, []);
 
   const sendMessage = async () => {
-    if (selectedFile) {
-      console.log(selectedFile, 'selectedFilepdf');
-
+    if (selectedFile?.uri) {
+     // console.log(selectedFile, 'selectedFilepdf');
       const formData = new FormData();
       formData.append('file', {
         uri: selectedFile.uri,
@@ -284,7 +283,6 @@ const Userchat: FC<any> = props => {
         setMessages(prev => [msg, ...prev]);
         setSelectedFile(null);
       }
-
       return;
     }
 
@@ -568,7 +566,6 @@ const Userchat: FC<any> = props => {
       >
         <View style={{ flex: 1 }}>
           <FlatList
-            // messages खाली होने पर chatState को कॉपी करके सुरक्षित रूप से रिवर्स रेंडर करें
             data={messages.length ? messages : [...chatState].reverse()}
             keyExtractor={(item, index) =>
               item?._id?.toString() ||
